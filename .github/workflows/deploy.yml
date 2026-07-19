@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: aws-automatic-image-optimization-system
+        working-directory: aws_automatic_image_optimization_system
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
