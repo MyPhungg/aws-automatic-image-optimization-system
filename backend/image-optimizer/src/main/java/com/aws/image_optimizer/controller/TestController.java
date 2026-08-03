@@ -1,4 +1,4 @@
-package com.aws.google_login.controller;
+package com.aws.image_optimizer.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

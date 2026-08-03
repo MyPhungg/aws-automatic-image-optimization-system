@@ -3,9 +3,11 @@ package com.aws.image_optimizer.service;
 import com.aws.image_optimizer.dto.HistoryResponse;
 import com.aws.image_optimizer.dto.UserUsageResponse;
 import com.aws.image_optimizer.entity.ImageMetadata;
+import com.aws.image_optimizer.entity.User;
 import com.aws.image_optimizer.entity.UserMetadata;
 import com.aws.image_optimizer.repository.ImageMetadataRepository;
 import com.aws.image_optimizer.repository.UserMetadataRepository;
+import com.aws.image_optimizer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserMetadataRepository userRepository;
+    private final UserRepository userRepository;
     private final ImageMetadataRepository imageRepository;
 
     public List<HistoryResponse> getHistory(String userId) {
@@ -71,7 +73,7 @@ public class UserService {
     }
     public List<UserUsageResponse> getUsersUsage() {
 
-        List<UserMetadata> users =
+        List<User> users =
                 userRepository.findAll();
 
 
@@ -106,4 +108,19 @@ public class UserService {
                 })
                 .toList();
     }
+
+
+
+    public User findById(String id){
+
+        return userRepository.findById(id);
+
+    }
+
+    public void save(User user){
+
+        userRepository.save(user);
+
+    }
+
 }

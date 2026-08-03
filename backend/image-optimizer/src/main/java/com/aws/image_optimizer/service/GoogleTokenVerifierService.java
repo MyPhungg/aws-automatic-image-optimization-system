@@ -1,6 +1,6 @@
-package com.aws.google_login.service;
+package com.aws.image_optimizer.service;
 
-import com.aws.google_login.config.GoogleProperties;
+import com.aws.image_optimizer.config.GoogleProperties;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;

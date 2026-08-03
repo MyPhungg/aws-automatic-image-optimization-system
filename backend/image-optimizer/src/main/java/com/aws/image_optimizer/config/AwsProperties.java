@@ -1,4 +1,4 @@
-package com.aws.google_login.config;
+package com.aws.image_optimizer.config;
 
 import lombok.Getter;
 import lombok.Setter;

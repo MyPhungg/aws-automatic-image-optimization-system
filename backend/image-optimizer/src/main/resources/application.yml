@@ -1,8 +1,24 @@
+spring:
+  application:
+    name: google-login
+
+server:
+  port: 8080
+
 aws:
   region: us-east-1
+  access-key: ${AWS_ACCESS_KEY_ID}
+  secret-key: ${AWS_SECRET_ACCESS_KEY}
 dynamodb:
   image-table: ImageMetadata
   user-table: UserMetadata
 s3:
   input-bucket: auto-images-input-bucket
   output-bucket: auto-images-output-bucket
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000

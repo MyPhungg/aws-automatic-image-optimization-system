@@ -1,6 +1,6 @@
-package com.aws.google_login.service;
+package com.aws.image_optimizer.service;
 
-import com.aws.google_login.entity.User;
+import com.aws.image_optimizer.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;

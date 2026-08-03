@@ -1,4 +1,4 @@
-package com.aws.google_login.entity;
+package com.aws.image_optimizer.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

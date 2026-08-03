@@ -1,4 +1,4 @@
-package com.aws.google_login.dto;
+package com.aws.image_optimizer.dto;
 
 import lombok.Data;
 

@@ -1,8 +1,8 @@
-package com.aws.google_login.service;
+package com.aws.image_optimizer.service;
 
-import com.aws.google_login.dto.AuthResponse;
-import com.aws.google_login.entity.User;
-import com.aws.google_login.repository.UserRepository;
+import com.aws.image_optimizer.dto.AuthResponse;
+import com.aws.image_optimizer.entity.User;
+import com.aws.image_optimizer.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
