@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -83,6 +85,33 @@ public class AuthController {
                         .name(authResponse.getName())
                         .avatarUrl(authResponse.getAvatarUrl())
                         .build()
+        );
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            HttpServletResponse response
+    ) {
+
+        Cookie cookie =
+                new Cookie(
+                        "access_token",
+                        null
+                );
+
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // localhost
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+
+        response.addCookie(cookie);
+
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Logout successfully"
+                )
         );
     }
 //    @PostMapping("/google")
