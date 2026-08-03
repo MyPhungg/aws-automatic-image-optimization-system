@@ -44,7 +44,7 @@ public class ImageMetadataRepository {
 
 
     // GET 1 IMAGE
-    public Optional<ImageMetadata> findById(
+    public ImageMetadata findById(
             String batchId,
             String processingId
     ) {
@@ -55,9 +55,8 @@ public class ImageMetadataRepository {
                 .build();
 
 
-        return Optional.ofNullable(
-                table.getItem(key)
-        );
+        return table.getItem(key);
+
     }
 
 

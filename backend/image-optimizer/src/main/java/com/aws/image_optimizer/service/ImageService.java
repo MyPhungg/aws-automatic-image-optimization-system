@@ -11,9 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.nio.file.*;
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.zip.*;
 
 @Service
 @RequiredArgsConstructor
@@ -132,6 +137,162 @@ public class ImageService {
                 .batchId(batchId)
                 .images(response)
                 .build();
+    }
+    public String downloadSingle(
+            String batchId,
+            String processingId
+    ){
+
+        ImageMetadata metadata =
+                imageMetadataRepository.findById(
+                        batchId,
+                        processingId
+                );
+
+
+        if(metadata == null){
+            throw new RuntimeException(
+                    "Image not found"
+            );
+        }
+
+
+        if(!"SUCCESS".equals(metadata.getStatus())){
+            throw new RuntimeException(
+                    "Image is not processed yet"
+            );
+        }
+
+
+        return s3Service.generateDownloadUrl(
+                metadata.getOutputKey()
+        );
+    }
+
+
+
+    public List<Map<String,String>> downloadBatch(
+            String batchId
+    ){
+
+        List<ImageMetadata> images =
+                imageMetadataRepository.findByBatchId(batchId);
+
+
+
+        return images.stream()
+                .filter(image ->
+                        "SUCCESS".equals(image.getStatus())
+                )
+                .map(image -> Map.of(
+                        "fileName",
+                        image.getOriginalName(),
+
+                        "downloadUrl",
+                        s3Service.generateDownloadUrl(
+                                image.getOutputKey()
+                        )
+                ))
+                .toList();
+    }
+
+    public String createZipDownloadUrl(
+            String batchId
+    ) {
+
+        try {
+
+            List<ImageMetadata> images =
+                    imageMetadataRepository.findByBatchId(batchId);
+
+
+            if (images.isEmpty()) {
+                throw new RuntimeException(
+                        "No images found"
+                );
+            }
+
+
+            Path zipPath =
+                    Files.createTempFile(
+                            "batch-",
+                            ".zip"
+                    );
+
+
+            try (
+                    FileOutputStream fos =
+                            new FileOutputStream(zipPath.toFile());
+
+                    ZipOutputStream zip =
+                            new ZipOutputStream(fos)
+            ) {
+
+
+                for (ImageMetadata image : images) {
+
+
+                    if (!"SUCCESS".equals(image.getStatus())) {
+                        continue;
+                    }
+
+
+                    InputStream input =
+                            s3Service.download(
+                                    image.getOutputKey()
+                            );
+
+
+                    ZipEntry entry =
+                            new ZipEntry(
+                                    image.getOriginalName()
+                            );
+
+
+                    zip.putNextEntry(entry);
+
+
+                    input.transferTo(zip);
+
+
+                    zip.closeEntry();
+
+                    input.close();
+                }
+            }
+
+
+            String zipKey =
+                    "downloads/"
+                            + batchId
+                            + ".zip";
+
+
+            s3Service.uploadZip(
+                    zipPath.toFile(),
+                    zipKey
+            );
+
+
+            return s3Service.generateDownloadUrl(
+                    zipKey
+            );
+
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Failed to create zip file",
+                    e
+            );
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(
+                    "Batch download failed",
+                    e
+            );
+        }
     }
 }
 //@Service

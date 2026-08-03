@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
+import java.io.File;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,6 +105,39 @@ public class S3Service {
 
     public String getInputBucket(){
         return inputBucket;
+    }
+    public InputStream download(
+            String key
+    ) {
+
+        GetObjectRequest request =
+                GetObjectRequest.builder()
+                        .bucket(outputBucket)
+                        .key(key)
+                        .build();
+
+
+        return s3Client.getObject(request);
+    }
+    public void uploadZip(
+            File file,
+            String key
+    ){
+
+        PutObjectRequest request =
+                PutObjectRequest.builder()
+                        .bucket(outputBucket)
+                        .key(key)
+                        .contentType(
+                                "application/zip"
+                        )
+                        .build();
+
+
+        s3Client.putObject(
+                request,
+                RequestBody.fromFile(file)
+        );
     }
 }
 /*

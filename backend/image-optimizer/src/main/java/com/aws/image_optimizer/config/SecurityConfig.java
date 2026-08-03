@@ -24,7 +24,25 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
+                        // API public
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/image/batches/**"
+                        )
+                        .permitAll()
+
+                        // API cần đăng nhập
+                        .requestMatchers(
+                                "/api/image/history",
+                                "/api/images/**"
+                        )
+                        .authenticated()
+
+                        // còn lại
+                        .anyRequest()
+                        .authenticated()
+                )
+//                        .anyRequest().permitAll())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(form -> form.disable());
 
