@@ -3,6 +3,7 @@ package com.aws.image_optimizer.controller;
 import com.aws.image_optimizer.dto.BatchResponse;
 import com.aws.image_optimizer.dto.OptimizationConfigRequest;
 import com.aws.image_optimizer.service.ImageService;
+import com.aws.image_optimizer.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,17 +19,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ImageController {
     private final ImageService imageService;
+    private final SecurityUtils securityUtils;
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(
             @RequestPart("files") MultipartFile[] files,
             @RequestPart("format") String format,
-            @RequestParam String configReq
-    ) throws Exception {
-//            Authentication authentication;
+            @RequestParam String configReq,
+            Authentication authentication
 
-        String userId = "user001";
-//                authentication.getName();
+    ) throws Exception {
+
+//        String userId = "user001";
+
+        String userId = securityUtils.getCurrentUserId(authentication);
 
         ObjectMapper mapper = new ObjectMapper();
 

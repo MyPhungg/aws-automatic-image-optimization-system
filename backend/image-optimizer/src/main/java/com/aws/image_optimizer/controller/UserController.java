@@ -2,6 +2,7 @@ package com.aws.image_optimizer.controller;
 
 import com.aws.image_optimizer.entity.User;
 import com.aws.image_optimizer.service.UserService;
+import com.aws.image_optimizer.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,21 +15,23 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final SecurityUtils securityUtils;
     @GetMapping
     public ResponseEntity<?> history(
-//            Authentication authentication;
-    ){
+            Authentication authentication
+    ) {
 
-        String userId ="user001";
-//                authentication.getName();
+//        String userId ="user001";
+        String userId = securityUtils.getCurrentUserId(authentication);
 
 
         return ResponseEntity.ok(
                 userService.getHistory(userId)
         );
     }
+
     @GetMapping("/all")
-    public ResponseEntity<?> users(){
+    public ResponseEntity<?> users() {
 
         return ResponseEntity.ok(
                 userService.getUsersUsage()
@@ -37,13 +40,14 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public User get(@PathVariable String id){
+    public User get(@PathVariable String id) {
 
         return userService.findById(id);
 
     }
+
     @PostMapping("/test")
-    public String saveTestUser(){
+    public String saveTestUser() {
 
         User user = User.builder()
                 .userId("123456")
