@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
@@ -19,16 +20,19 @@ public class ImageController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(
-            @RequestParam("files") MultipartFile[] files,
-            @RequestParam String format,
-            @RequestBody OptimizationConfigRequest config,
-            Authentication authentication
-    ){
+            @RequestPart("files") MultipartFile[] files,
+            @RequestPart("format") String format,
+            @RequestParam String configReq
+    ) throws Exception {
+//            Authentication authentication;
 
-        String userId =
-                authentication.getName();
+        String userId = "user001";
+//                authentication.getName();
 
+        ObjectMapper mapper = new ObjectMapper();
 
+        OptimizationConfigRequest config =
+                mapper.readValue(configReq, OptimizationConfigRequest.class);
         String batchId =
                 imageService.uploadImages(
                         files,

@@ -68,7 +68,7 @@ public class ImageMetadata {
     private Double compressionRatio;
 
 
-    private Long processingTimeMs;
+    private Double processingTimeMs;
 
 
 

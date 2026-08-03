@@ -65,6 +65,7 @@ public class ImageService {
                 .userId(userId)
                 .originalName(file.getOriginalFilename())
                 .format(format)
+                .originalSize(file.getSize())
                 .optimizationConfig(config)
                 .uploadedAt(Instant.now().toString())
                 .status("PENDING")

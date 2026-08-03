@@ -13,11 +13,11 @@ public class UserController {
     private final UserService userService;
     @GetMapping
     public ResponseEntity<?> history(
-            Authentication authentication
+//            Authentication authentication;
     ){
 
-        String userId =
-                authentication.getName();
+        String userId ="user001";
+//                authentication.getName();
 
 
         return ResponseEntity.ok(
