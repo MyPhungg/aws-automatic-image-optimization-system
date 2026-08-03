@@ -1,4 +1,8 @@
 aws:
   region: us-east-1
+dynamodb:
+  image-table: ImageMetadata
+  user-table: UserMetadata
 s3:
-  bucket-name: auto-images-input-bucket
+  input-bucket: auto-images-input-bucket
+  output-bucket: auto-images-output-bucket
