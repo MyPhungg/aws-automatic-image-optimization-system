@@ -1,0 +1,237 @@
+/* ==========================================
+   Hero
+========================================== */
+
+.hero{
+
+padding:80px 0;
+
+}
+
+.hero-container{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:60px;
+
+}
+
+/* ==========================================
+   Left
+========================================== */
+
+.hero-content{
+
+flex:1;
+
+}
+
+.hero-tag{
+
+background:#DBEAFE;
+
+color:#2563EB;
+
+padding:8px 16px;
+
+border-radius:30px;
+
+font-weight:600;
+
+display:inline-block;
+
+margin-bottom:25px;
+
+}
+
+.hero-title{
+
+font-size:52px;
+
+line-height:1.2;
+
+margin-bottom:25px;
+
+color:#111827;
+
+}
+
+.hero-description{
+
+font-size:18px;
+
+line-height:1.8;
+
+color:#6B7280;
+
+margin-bottom:30px;
+
+}
+
+.hero-features{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:20px;
+
+margin-bottom:35px;
+
+}
+
+.hero-features span{
+
+background:#F3F4F6;
+
+padding:10px 16px;
+
+border-radius:8px;
+
+font-weight:600;
+
+}
+
+/* ==========================================
+   Button
+========================================== */
+
+.hero-buttons{
+
+display:flex;
+
+gap:20px;
+
+}
+
+.primary-btn{
+
+padding:14px 28px;
+
+background:#2563EB;
+
+color:white;
+
+border:none;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:16px;
+
+}
+
+.primary-btn:hover{
+
+background:#1D4ED8;
+
+}
+
+.secondary-btn{
+
+padding:14px 28px;
+
+background:white;
+
+border:2px solid #2563EB;
+
+color:#2563EB;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:16px;
+
+}
+
+.secondary-btn:hover{
+
+background:#EFF6FF;
+
+}
+
+/* ==========================================
+   Right
+========================================== */
+
+.hero-image{
+
+flex:1;
+
+display:flex;
+
+justify-content:center;
+
+}
+
+.image-placeholder{
+
+width:420px;
+
+height:320px;
+
+background:#E5E7EB;
+
+border-radius:20px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:40px;
+
+color:#6B7280;
+
+font-weight:bold;
+
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media(max-width:900px){
+
+.hero-container{
+
+flex-direction:column;
+
+text-align:center;
+
+}
+
+.hero-buttons{
+
+justify-content:center;
+
+}
+
+.hero-features{
+
+justify-content:center;
+
+}
+
+.hero-title{
+
+font-size:38px;
+
+}
+
+.image-placeholder{
+
+width:100%;
+
+max-width:380px;
+
+}
+
+}
