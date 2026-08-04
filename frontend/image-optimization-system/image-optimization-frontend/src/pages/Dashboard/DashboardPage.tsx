@@ -3,7 +3,7 @@ import "./DashboardPage.css";
 import DashboardHeader from "./components/DashboardHeader";
 import SummaryCards from "./components/SummaryCards";
 import RecentProcessing from "./components/RecentProcessing";
-import QuickActions from "./components/QuickAction";
+import QuickActions from "./components/QuickActions";
 function DashboardPage() {
 
     return (
