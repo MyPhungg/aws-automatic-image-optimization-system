@@ -1,0 +1,36 @@
+.statistics {
+    padding: 80px 0;
+}
+.statistics-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+.statistics-header h2 {
+    font-size: 40px;
+    margin-bottom: 30px;
+    color: #111827;
+}
+.statistics-header p {
+    font-size: 18px;
+    color: #6B7280;
+}
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+}
+.statistics-card{
+    background: #2563EB;
+    color:white;
+    padding: 40px;
+    border-radius: 18px;
+    text-align: center;
+    transition: .3s;
+}
+.statistics-card:hover{
+    transform: translateY(-8px);
+}
+.statistics-card h3{
+    font-size: 18px;
+    opacity: .95;
+}
