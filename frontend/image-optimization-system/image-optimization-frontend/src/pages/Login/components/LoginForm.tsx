@@ -7,7 +7,8 @@ import AuthCard from "../../../components/Auth/AuthCard";
 import AuthInput from "../../../components/Auth/AuthInput";
 import AuthButton from "../../../components/Auth/AuthButton";
 import AuthDivider from "../../../components/Auth/AuthDivider";
-
+import GoogleLoginButton from "../../../components/Auth/GoogleLoginButton";
+import { authService } from "../../../services/authService";
 function LoginForm() {
 
     const navigate = useNavigate();
@@ -66,32 +67,61 @@ function LoginForm() {
         return valid;
 
     }
-
     function handleLogin() {
 
-        setLoading(true);
+    alert("Email login is not available yet. Please use Google Sign-In.");
 
-        setTimeout(() => {
+}
 
-            login({
+//     async function handleLogin() {
 
-                id: crypto.randomUUID(),
+//     try {
 
-                fullName: "Demo User",
+//         setLoading(true);
 
-                email: email,
+//         const result = await authService.login({
 
-                avatar: ""
+//             email,
 
-            });
+//             password
 
-            setLoading(false);
+//         });
 
-            navigate("/dashboard");
+//         login(
 
-        },1000);
+//             result.token,
 
-    }
+//             {
+
+//                 name: result.name,
+
+//                 email: result.email,
+
+//                 avatarUrl: result.avatarUrl
+
+//             }
+
+//         );
+
+//         navigate("/dashboard");
+
+//     }
+
+//     catch (error) {
+
+//         console.error(error);
+
+//         alert("Email hoặc mật khẩu không đúng.");
+
+//     }
+
+//     finally {
+
+//         setLoading(false);
+
+//     }
+
+// }
 
     return (
 
@@ -190,7 +220,7 @@ function LoginForm() {
             />
 
             <AuthDivider />
-
+            <GoogleLoginButton />
             <div className="bottom-links">
 
                 <p>

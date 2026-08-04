@@ -60,11 +60,11 @@ function MainLayout() {
 
                                 <div className="avatar">
 
-                                    {user?.fullName.charAt(0)}
+                                    {user?.name.charAt(0)}
 
                                 </div>
 
-                                <h4>{user?.fullName}</h4>
+                                <h4>{user?.name}</h4>
 
                                 <p>{user?.email}</p>
 

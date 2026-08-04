@@ -5,6 +5,7 @@ import type { CompressionModeType } from "../compressionMode/CompressionMode";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import type { CompressionPreset } from "../../../../types/ImageItem";
 import StatusBadge from "../StatusBadge/StatusBadge";
+import { imageService } from "../../../../services/imageService";
 interface ImageCardProps {
 
     image: Imageitem;
@@ -166,12 +167,21 @@ function ImageCard({
                     <button className="preview-btn" onClick={() => {window.open(image.result?.outputUrl, "_blank")}}>Preview</button>
                     <button className="download-btn"
                     onClick={() => {
-                        const link = document.createElement("a");
-                        link.href = image.result?.outputUrl || "";
-                        link.download = image.name;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                        const download = async(id:string)=>{
+
+                        const response = await imageService.downloadImage(id);
+
+                        const url = window.URL.createObjectURL(response.data);
+
+                        const a=document.createElement("a");
+
+                        a.href=url;
+
+                        a.download="image.jpg";
+
+                        a.click();
+
+                    }
                     }}>
                         Download
                     </button>

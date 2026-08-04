@@ -40,7 +40,7 @@ function DashboardHeader() {
 
                         {" "}
 
-                        {user?.fullName ?? "Guest"}
+                        {user?.name ?? "Guest"}
 
                     </span>
 

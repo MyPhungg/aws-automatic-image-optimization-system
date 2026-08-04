@@ -1,6 +1,7 @@
 import {
     createContext,
     useContext,
+    useEffect,
     useState,
     type ReactNode,
 } from "react";
@@ -13,7 +14,10 @@ interface AuthContextType {
 
     isAuthenticated: boolean;
 
-    login: (user: User) => void;
+    login: (
+        token: string,
+        user: User
+    ) => void;
 
     logout: () => void;
 
@@ -37,27 +41,85 @@ export function AuthProvider({
 
     const [user, setUser] = useState<User | null>(null);
 
-    function login(userData: User) {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-        setUser(userData);
+    // Khôi phục phiên đăng nhập khi F5
+    useEffect(() => {
 
-    }
+        const token = localStorage.getItem("token");
 
-    function logout() {
+        const userData = localStorage.getItem("user");
+
+        if (token && userData) {
+
+            setUser(JSON.parse(userData));
+
+            setIsAuthenticated(true);
+
+        }
+
+    }, []);
+
+    // Login
+    const login = (
+
+        token: string,
+
+        user: User
+
+    ) => {
+
+        localStorage.setItem(
+
+            "token",
+
+            token
+
+        );
+
+        localStorage.setItem(
+
+            "user",
+
+            JSON.stringify(user)
+
+        );
+
+        setUser(user);
+
+        setIsAuthenticated(true);
+
+    };
+
+    // Logout
+    const logout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
 
         setUser(null);
 
-    }
+        setIsAuthenticated(false);
+
+    };
 
     return (
 
         <AuthContext.Provider
+
             value={{
+
                 user,
-                isAuthenticated: !!user,
+
+                isAuthenticated,
+
                 login,
+
                 logout,
+
             }}
+
         >
 
             {children}

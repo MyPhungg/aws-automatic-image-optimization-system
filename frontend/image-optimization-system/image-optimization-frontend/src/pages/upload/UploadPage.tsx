@@ -24,6 +24,7 @@ import UploadDropzone from "../upload/components/UploadDropzone/UploadDropzone.t
 import UploadSummary from "./components/UploadSummary/UploadSummary.tsx";
 
 import "./UploadPage.css";
+import { imageService } from "../../services/imageService.ts";
 
 function UploadPage() {
   const [images, setImages] = useState<Imageitem[]>([]);
@@ -51,21 +52,41 @@ function UploadPage() {
     );
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
+
     const result = validateImages(images, mode, globalPreset);
+
     if (!result.valid) {
-      alert(result.errors.join("\n"));
-      console.log("Validation errors:", result.errors);
-      return;
+
+        alert(result.errors.join("\n"));
+
+        return;
+
     }
 
-    if (result.warnings.length > 0) {
-      alert(["Upload warnings:", ...result.warnings].join("\n"));
-      console.log("Validation warnings:", result.warnings);
+    const formData = new FormData();
+
+    images.forEach(image => {
+
+        formData.append("files", image.file);
+
+    });
+
+    try {
+
+        const response = await imageService.upload(formData);
+
+        console.log(response.data);
+
     }
 
-    console.log("Validation passed.");
-  };
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
 
   useEffect(() => {
     if (mode !== "CUSTOM") {

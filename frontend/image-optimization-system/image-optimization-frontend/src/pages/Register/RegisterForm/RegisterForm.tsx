@@ -8,6 +8,7 @@ import AuthCard from "../../../components/Auth/AuthCard";
 import AuthInput from "../../../components/Auth/AuthInput";
 import AuthButton from "../../../components/Auth/AuthButton";
 import AuthDivider from "../../../components/Auth/AuthDivider";
+import GoogleLoginButton from "../../../components/Auth/GoogleLoginButton";
 
 function RegisterForm() {
 
@@ -233,6 +234,7 @@ function RegisterForm() {
             />
 
             <AuthDivider />
+            <GoogleLoginButton />
 
             <div className="register-bottom">
 
