@@ -45,10 +45,15 @@ export default function AdminDashboard() {
     const sortedUsers = [...filteredUsers].sort((a, b) => {
         const valA = a[sortKey];
         const valB = b[sortKey];
+
         const normalizedA = typeof valA === "number" ? valA : String(valA ?? "");
         const normalizedB = typeof valB === "number" ? valB : String(valB ?? "");
         if (normalizedA < normalizedB) return sortOrder === "asc" ? -1 : 1;
         if (normalizedA > normalizedB) return sortOrder === "asc" ? 1 : -1;
+// =======
+//         if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+//         if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+// >>>>>>> main
         return 0;
     });
 
