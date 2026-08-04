@@ -1,0 +1,75 @@
+.dashboard-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:35px;
+
+    flex-wrap:wrap;
+
+    gap:20px;
+
+}
+
+.dashboard-header-left h1{
+
+    font-size:34px;
+
+    color:#111827;
+
+    margin-bottom:10px;
+
+}
+
+.dashboard-header-left h2{
+
+    font-size:24px;
+
+    font-weight:600;
+
+    margin-bottom:10px;
+
+    color:#374151;
+
+}
+
+.dashboard-header-left span{
+
+    color:#2563EB;
+
+}
+
+.dashboard-header-left p{
+
+    color:#6B7280;
+
+    max-width:550px;
+
+}
+
+.dashboard-header-right{
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+.dashboard-date{
+
+    background:white;
+
+    padding:14px 18px;
+
+    border-radius:12px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+
+    font-weight:600;
+
+    color:#374151;
+
+}

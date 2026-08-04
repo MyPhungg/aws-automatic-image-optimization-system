@@ -1,0 +1,59 @@
+.recent-processing{
+
+    margin-top:35px;
+
+}
+
+.recent-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.recent-header h2{
+
+    margin:0;
+
+    color:#111827;
+
+}
+
+.recent-header button{
+
+    border:none;
+
+    background:#2563EB;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+.recent-header button:hover{
+
+    background:#1D4ED8;
+
+}
+
+.recent-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+}

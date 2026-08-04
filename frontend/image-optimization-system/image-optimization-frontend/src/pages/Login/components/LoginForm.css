@@ -1,0 +1,127 @@
+.login-header{
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+}
+
+.login-header h1{
+
+    font-size:32px;
+
+    margin-bottom:10px;
+
+    color:#1F2937;
+
+}
+
+.login-header p{
+
+    color:#6B7280;
+
+}
+
+.login-options{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.remember{
+
+    display:flex;
+
+    gap:8px;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    color:#4B5563;
+
+}
+
+.remember input{
+
+    width:16px;
+
+    height:16px;
+
+}
+
+.forgot{
+
+    text-decoration:none;
+
+    color:#2563EB;
+
+    font-weight:500;
+
+}
+
+.forgot:hover{
+
+    text-decoration:underline;
+
+}
+
+.bottom-links{
+
+    margin-top:25px;
+
+    text-align:center;
+
+}
+
+.bottom-links p{
+
+    margin-bottom:8px;
+
+    color:#6B7280;
+
+}
+
+.bottom-links a{
+
+    text-decoration:none;
+
+    color:#2563EB;
+
+    font-weight:600;
+
+}
+
+.bottom-links a:hover{
+
+    text-decoration:underline;
+
+}
+
+.guest-link{
+
+    display:block;
+
+    text-align:center;
+
+    margin-top:25px;
+
+    text-decoration:none;
+
+    color:#374151;
+
+    font-weight:500;
+
+}
+
+.guest-link:hover{
+
+    color:#2563EB;
+
+}

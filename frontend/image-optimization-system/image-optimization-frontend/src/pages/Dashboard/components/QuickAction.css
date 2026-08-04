@@ -1,0 +1,21 @@
+.quick-actions{
+
+    margin-top:40px;
+
+}
+
+.quick-actions h2{
+
+    margin-bottom:20px;
+
+}
+
+.quick-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}

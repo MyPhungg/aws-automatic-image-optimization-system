@@ -1,0 +1,39 @@
+.history-table-wrapper{
+
+    background:white;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.05);
+
+}
+
+.history-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.history-table th{
+
+    background:#F8FAFC;
+
+    text-align:left;
+
+    padding:16px;
+
+    color:#475569;
+
+}
+
+.history-table td{
+
+    padding:16px;
+
+    border-top:1px solid #E5E7EB;
+
+}
