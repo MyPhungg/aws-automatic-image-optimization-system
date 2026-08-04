@@ -81,6 +81,7 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 LoginResult.builder()
+                        .userId(authResponse.getUserId())
                         .email(authResponse.getEmail())
                         .name(authResponse.getName())
                         .avatarUrl(authResponse.getAvatarUrl())
