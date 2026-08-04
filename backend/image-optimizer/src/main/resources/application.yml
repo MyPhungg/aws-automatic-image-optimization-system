@@ -6,12 +6,15 @@ server:
   port: 8080
 
 aws:
-  region: ${AWS_REGION}
+  region: us-east-1
   access-key: ${AWS_ACCESS_KEY_ID}
   secret-key: ${AWS_SECRET_ACCESS_KEY}
-
+dynamodb:
+  image-table: ImageMetadata
+  user-table: UserMetadata
 s3:
-  bucket-name: auto-images-input-bucket
+  input-bucket: auto-images-input-bucket
+  output-bucket: auto-images-output-bucket
 
 google:
   client-id: ${GOOGLE_CLIENT_ID}

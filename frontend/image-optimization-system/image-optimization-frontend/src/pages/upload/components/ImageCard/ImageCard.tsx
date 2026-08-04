@@ -164,31 +164,68 @@ function ImageCard({
             {
                 image.status === "SUCCESS" && 
                 <div className="action-group">
-                    <button className="preview-btn" onClick={() => {window.open(image.result?.outputUrl, "_blank")}}>Preview</button>
-                    <button className="download-btn"
-                    onClick={() => {
-                        const download = async(id:string)=>{
+                    <button
+                        className="preview-btn"
+                        onClick={() => {
+                            const url = image.result?.outputUrl ?? image.result?.thumbnailUrl ?? image.optimizedUrl;
+                            if (url) window.open(url, "_blank");
+                        }}
+                    >
+                        Preview
+                    </button>
 
-                        const response = await imageService.downloadImage(id);
+                    <button
+                        className="download-btn"
+                        onClick={async () => {
+                            try {
+                                const batchId = image.batchId ?? image.id;
+                                const processingId = image.processingId ?? image.id;
+                                const response = await imageService.downloadImage(batchId, processingId);
 
-                        const url = window.URL.createObjectURL(response.data);
+                                const blob = response.data as Blob;
+                                const blobUrl = window.URL.createObjectURL(blob);
 
-                        const a=document.createElement("a");
+                                const a = document.createElement("a");
+                                // try to derive filename from result URL if available
+                                const deriveName = () => {
+                                    const out = image.result?.outputUrl;
+                                    if (out) {
+                                        try {
+                                            const path = out.split('?')[0];
+                                            const name = path.substring(path.lastIndexOf('/') + 1);
+                                            if (name) return name;
+                                        } catch (_) {}
+                                    }
+                                    return image.name ?? "image.jpg";
+                                };
 
-                        a.href=url;
-
-                        a.download="image.jpg";
-
-                        a.click();
-
-                    }
-                    }}>
+                                a.href = blobUrl;
+                                a.download = deriveName();
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                window.URL.revokeObjectURL(blobUrl);
+                            } catch (err) {
+                                console.error("Download failed", err);
+                            }
+                        }}
+                    >
                         Download
                     </button>
-                    <button className="copy-btn"
-                    onClick={() => {
-                        navigator.clipboard.writeText(image.result?.outputUrl??"")
-                    }}>Copy Link</button>
+
+                    <button
+                        className="copy-btn"
+                        onClick={async () => {
+                            const url = image.result?.outputUrl ?? image.result?.thumbnailUrl ?? image.optimizedUrl ?? "";
+                            try {
+                                await navigator.clipboard.writeText(url);
+                            } catch (err) {
+                                console.error("Copy failed", err);
+                            }
+                        }}
+                    >
+                        Copy Link
+                    </button>
                 </div>
             }
             {

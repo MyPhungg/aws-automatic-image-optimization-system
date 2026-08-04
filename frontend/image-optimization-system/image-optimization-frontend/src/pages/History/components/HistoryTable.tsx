@@ -1,10 +1,48 @@
 import "./HistoryTable.css";
 
-import { dashboardHistory } from "../../../data/dashboardHistory";
-
+import { useEffect, useState } from "react";
 import HistoryRow from "./HistoryRow";
+import { dashBoardService, type HistoryResponse } from "../../../services/dashBoardService";
 
-function HistoryTable(){
+interface Props {
+    currentPage: number;
+    pageSize: number;
+    onTotalItemsChange?: (total: number) => void;
+}
+
+function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
+
+    const [history, setHistory] = useState<HistoryResponse[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+        const load = async () => {
+            try {
+                const res = await dashBoardService.getMyHistory();
+                if (!mounted) return;
+                const data = res.data || [];
+                setHistory(data);
+                onTotalItemsChange && onTotalItemsChange(data.length);
+            } catch (err: any) {
+                console.error(err);
+                setError(err?.message ?? "Failed to load history");
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+
+        load();
+
+        return () => {
+            mounted = false;
+        };
+    }, [onTotalItemsChange]);
+
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const pageItems = history.slice(start, end);
 
     return(
 
@@ -16,19 +54,15 @@ function HistoryTable(){
 
                     <tr>
 
-                        <th>Image</th>
+                        <th>Batch ID</th>
 
-                        <th>Filename</th>
+                        <th>Uploaded At</th>
 
-                        <th>Original</th>
+                        <th>Total</th>
 
-                        <th>Optimized</th>
+                        <th>Success</th>
 
-                        <th>Preset</th>
-
-                        <th>Status</th>
-
-                        <th>Time</th>
+                        <th>Failed</th>
 
                         <th>Action</th>
 
@@ -38,21 +72,17 @@ function HistoryTable(){
 
                 <tbody>
 
-                    {
-
-                        dashboardHistory.map(item=>(
-
-                            <HistoryRow
-
-                                key={item.id}
-
-                                item={item}
-
-                            />
-
+                    {loading ? (
+                        <tr><td colSpan={6}>Loading...</td></tr>
+                    ) : error ? (
+                        <tr><td colSpan={6} style={{color:'red'}}>{error}</td></tr>
+                    ) : pageItems.length === 0 ? (
+                        <tr><td colSpan={6}>No history found.</td></tr>
+                    ) : (
+                        pageItems.map(item => (
+                            <HistoryRow key={item.batchId} item={item as any} />
                         ))
-
-                    }
+                    )}
 
                 </tbody>
 

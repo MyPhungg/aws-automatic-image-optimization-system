@@ -14,8 +14,10 @@ function HistoryPage() {
     const [preset,setPreset]=useState("ALL");
 
     const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [totalItems, setTotalItems] = useState(0);
 
-    const totalPages = 13;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
     return (
 
@@ -55,7 +57,7 @@ function HistoryPage() {
             </div>
 
             <HistoryHeader />
-            <HistoryTable />
+            <HistoryTable currentPage={currentPage} pageSize={pageSize} onTotalItemsChange={setTotalItems} />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}/>
         </div>
 

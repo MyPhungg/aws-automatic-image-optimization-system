@@ -18,7 +18,7 @@ function GoogleLoginButton() {
             );
 
             login(
-                result.token,
+                result.token ?? "",
                 {
                     name: result.name,
                     email: result.email,

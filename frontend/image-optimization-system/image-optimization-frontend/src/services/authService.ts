@@ -2,13 +2,11 @@ import api from "../api/axios";
 
 export interface GoogleLoginResponse {
 
-    token: string;
-
+    token?: string;
+    userId?: string;
     email: string;
-
     name: string;
-
-    avatarUrl: string;
+    avatarUrl?: string;
 
 }
 
@@ -23,7 +21,10 @@ export const authService = {
             }
         );
 
-        return response.data;
+        return {
+            ...response.data,
+            token: response.data.token ?? response.data.userId ?? "",
+        };
 
     }
 

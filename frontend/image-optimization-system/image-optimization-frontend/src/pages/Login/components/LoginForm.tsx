@@ -1,17 +1,13 @@
 import "./LoginForm.css";
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
+import { Link } from "react-router-dom";
 import AuthCard from "../../../components/Auth/AuthCard";
 import AuthInput from "../../../components/Auth/AuthInput";
 import AuthButton from "../../../components/Auth/AuthButton";
 import AuthDivider from "../../../components/Auth/AuthDivider";
 import GoogleLoginButton from "../../../components/Auth/GoogleLoginButton";
-import { authService } from "../../../services/authService";
 function LoginForm() {
-
-    const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
 
@@ -19,54 +15,12 @@ function LoginForm() {
 
     const [remember, setRemember] = useState(false);
 
-    const [loading, setLoading] = useState(false);
+    const [loading] = useState(false);
 
-    const [emailError, setEmailError] = useState("");
+    const [emailError] = useState("");
 
-    const [passwordError, setPasswordError] = useState("");
+    const [passwordError] = useState("");
 
-    const { login } = useAuth();  
-
-    function validate() {
-
-        let valid = true;
-
-        setEmailError("");
-        setPasswordError("");
-
-        if (!email.trim()) {
-
-            setEmailError("Email is required.");
-
-            valid = false;
-
-        }
-        else {
-
-            const regex =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (!regex.test(email)) {
-
-                setEmailError("Invalid email address.");
-
-                valid = false;
-
-            }
-
-        }
-
-        if (!password.trim()) {
-
-            setPasswordError("Password is required.");
-
-            valid = false;
-
-        }
-
-        return valid;
-
-    }
     function handleLogin() {
 
     alert("Email login is not available yet. Please use Google Sign-In.");

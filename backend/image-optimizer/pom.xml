@@ -81,6 +81,17 @@
             <version>2.47.5</version>
             <scope>compile</scope>
         </dependency>
+
+
+        <!-- AWS SDK DynamoDB Enhanced Client -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>dynamodb-enhanced</artifactId>
+            <version>2.47.5</version>
+        </dependency>
+
+
+        <!-- AWS SDK DynamoDB -->
 <!--        Login GG-->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>

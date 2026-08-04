@@ -47,6 +47,8 @@ export interface Imageitem {
     height: number;
     totalPixels: number;
     hash: string;
+    batchId?: string;
+    processingId?: string;
     optimizedSize?: number;
     optimizedUrl?:string;
     thumbnailUrl?:string;

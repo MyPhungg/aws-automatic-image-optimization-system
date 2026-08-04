@@ -1,92 +1,51 @@
 import "./HistoryRow.css";
 
-import type { ProcessingHistory } from "../../../types/ProcessingHistory";
+import "./HistoryRow.css";
+
+import { useState } from "react";
+import type { HistoryResponse } from "../../../services/dashBoardService";
+import { dashBoardService } from "../../../services/dashBoardService";
 
 interface Props{
-
-    item:ProcessingHistory;
-
+    item: HistoryResponse | any;
 }
 
 function HistoryRow({item}:Props){
+
+    const [loading, setLoading] = useState(false);
+
+    const handleView = async () => {
+        setLoading(true);
+        try{
+            const res = await dashBoardService.getBatch(item.batchId);
+            // navigate or open modal with batch data; for now log
+            console.log('batch', res.data);
+        }catch(err){
+            console.error(err);
+        }finally{
+            setLoading(false);
+        }
+    };
 
     return(
 
         <tr>
 
-            <td>
+            <td>{item.batchId}</td>
 
-                <img
+            <td>{item.uploadedAt}</td>
 
-                    src={item.thumbnail}
+            <td>{item.totalImages}</td>
 
-                    alt={item.fileName}
+            <td>{item.successImages}</td>
 
-                    className="history-thumbnail"
-
-                />
-
-            </td>
-
-            <td>{item.fileName}</td>
-
-            <td>{item.originalSize}</td>
-
-            <td>{item.optimizedSize}</td>
-
-            <td>{item.preset}</td>
+            <td>{item.failedImages}</td>
 
             <td>
 
-                <span
-
-                    className={`status ${item.status.toLowerCase()}`}
-
-                >
-
-                    {item.status}
-
-                </span>
-
-            </td>
-
-            <td>{item.uploadTime}</td>
-
-            <td>
-
-                {
-
-                    item.status==="Completed"
-
-                    ?
-
-                    <button>
-
-                        Download
-
-                    </button>
-
-                    :
-
-                    item.status==="Processing"
-
-                    ?
-
-                    <button>
-
-                        View
-
-                    </button>
-
-                    :
-
-                    <button>
-
-                        Retry
-
-                    </button>
-
-                }
+                <button onClick={handleView} disabled={loading}>
+                    {loading ? 'Loading...' : 'View'}
+                </button>
 
             </td>
 
