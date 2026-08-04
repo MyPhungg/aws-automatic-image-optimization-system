@@ -4,6 +4,7 @@ import com.aws.image_optimizer.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -34,6 +35,49 @@ public class JwtService {
                 .signWith(key)
                 .compact();
 
+    }
+    public String extractUsername(String token){
+
+        SecretKey key =
+                Keys.hmacShaKeyFor(
+                        secret.getBytes(StandardCharsets.UTF_8)
+                );
+
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+    public String extractRole(String token){
+
+        SecretKey key =
+                Keys.hmacShaKeyFor(
+                        secret.getBytes(StandardCharsets.UTF_8)
+                );
+
+
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
+    }
+    public boolean isValid(
+            String token,
+            UserDetails userDetails
+    ){
+
+        String username =
+                extractUsername(token);
+
+
+        return username.equals(
+                userDetails.getUsername()
+        );
     }
 
 }
