@@ -1,6 +1,7 @@
 name: Deploy CDK
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -32,7 +33,7 @@ jobs:
       - run: cdk diff --all
 
   deploy:
-    if: github.event_name == 'push'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -79,10 +80,18 @@ jobs:
             || aws secretsmanager create-secret --name amplify/google-client-id --secret-string "$VITE_GOOGLE_CLIENT_ID" >/dev/null
 
       - name: CDK Synth
-        run: cdk synth --all
+        run: cdk synth
 
-      - name: Deploy All Stacks
-        run: cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+      - name: Deploy CDK Stacks
+        run: |
+          cdk deploy \
+            StorageStack \
+            ProcessingStack \
+            BackendStack \
+            ApiStack \
+            AmplifyHostingStack \
+            --require-approval never \
+            --outputs-file cdk-outputs.json
 
       - name: Build React Frontend
         env:
