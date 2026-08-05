@@ -84,6 +84,30 @@ jobs:
       - name: Deploy All Stacks
         run: cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
 
+      - name: Build React Frontend
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+        run: |
+          API_GATEWAY_URL=$(python -c "import json; print(json.load(open('cdk-outputs.json'))['ApiStack']['ApiGatewayUrl'].rstrip('/'))")
+
+          cd frontend/image-optimization-system/image-optimization-frontend
+          echo "VITE_API_GATEWAY_URL=$API_GATEWAY_URL" > .env
+          echo "VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID" >> .env
+          npm ci
+          npm run build
+          cd dist
+          zip -r ../../../../frontend-dist.zip .
+
+      - name: Deploy Frontend to Amplify
+        run: |
+          AMPLIFY_APP_ID=$(python -c "import json; print(json.load(open('cdk-outputs.json'))['AmplifyHostingStack']['AmplifyAppId'])")
+          DEPLOYMENT=$(aws amplify create-deployment --app-id "$AMPLIFY_APP_ID" --branch-name main)
+          JOB_ID=$(python -c "import json, sys; print(json.loads(sys.argv[1])['jobId'])" "$DEPLOYMENT")
+          ZIP_UPLOAD_URL=$(python -c "import json, sys; print(json.loads(sys.argv[1])['zipUploadUrl'])" "$DEPLOYMENT")
+
+          curl -H "Content-Type: application/zip" --upload-file frontend-dist.zip "$ZIP_UPLOAD_URL"
+          aws amplify start-deployment --app-id "$AMPLIFY_APP_ID" --branch-name main --job-id "$JOB_ID"
+
       - name: Upload CDK Outputs
         uses: actions/upload-artifact@v4
         with:

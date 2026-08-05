@@ -20,7 +20,6 @@ class AmplifyHostingStack(Stack):
             self,
             "FrontendAmplifyApp",
             name="image-optimization-frontend",
-            repository="https://github.com/MyPhungg/aws-automatic-image-optimization-system",
             platform="WEB",
             enable_branch_auto_deletion=False,
             environment_variables=[
@@ -67,7 +66,7 @@ applications:
             app_id=app.attr_app_id,
             branch_name="main",
             stage="PRODUCTION",
-            enable_auto_build=True,
+            enable_auto_build=False,
         )
 
         CfnOutput(
