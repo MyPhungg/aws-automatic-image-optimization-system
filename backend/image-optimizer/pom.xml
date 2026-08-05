@@ -81,7 +81,6 @@
             <version>2.47.5</version>
             <scope>compile</scope>
         </dependency>
-<<<<<<< HEAD
 
 
         <!-- AWS SDK DynamoDB Enhanced Client -->
@@ -93,18 +92,13 @@
 
 
         <!-- AWS SDK DynamoDB -->
-=======
 <!--        Login GG-->
->>>>>>> main
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb</artifactId>
             <version>2.47.5</version>
         </dependency>
 
-<<<<<<< HEAD
-    </dependencies>
-=======
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>auth</artifactId>
@@ -157,7 +151,6 @@
             <version>2.31.58</version>
         </dependency>
 	</dependencies>
->>>>>>> main
 
 	<build>
 		<plugins>
