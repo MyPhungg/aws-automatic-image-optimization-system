@@ -12,7 +12,7 @@
     "PublishOutputRefImageMetadata0241C3557B8FB827": "aws-img-opt-metadata-table"
   },
   "ApiStack": {
-    "ApiGatewayUrl": "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod/",
-    "ImageUploadApiEndpointBC52FB8E": "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod/"
+    "ApiGatewayUrl": "https://4mirtuwkba.execute-api.us-east-1.amazonaws.com/prod/",
+    "ImageUploadApiEndpointBC52FB8E": "https://4mirtuwkba.execute-api.us-east-1.amazonaws.com/prod/"
   }
 }

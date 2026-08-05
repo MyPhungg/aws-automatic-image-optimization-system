@@ -4,7 +4,8 @@ import aws_cdk as cdk
 from aws_automatic_image_optimization_system.stacks import (
     StorageStack,
     ProcessingStack,
-    ApiStack
+    ApiStack,
+    BackendStack
 )
 
 app = cdk.App()
@@ -28,10 +29,22 @@ processing_stack = ProcessingStack(
     env=env
 )
 
-# 3. API Stack
+# 3. Backend Stack (Spring Boot on Lambda)
+backend_stack = BackendStack(
+    app, "BackendStack",
+    original_bucket=storage_stack.original_bucket,
+    optimized_bucket=storage_stack.optimized_bucket,
+    metadata_table=storage_stack.table,
+    user_table=storage_stack.user_table,
+    env=env
+)
+
+# 4. API Stack
 api_stack = ApiStack(
     app, "ApiStack",
     original_bucket=storage_stack.original_bucket,
+    metadata_table=storage_stack.table,
+    backend_lambda=backend_stack.spring_boot_lambda,
     env=env
 )
 

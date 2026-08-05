@@ -28,77 +28,7 @@ public class ImageService {
     private final S3Service s3Service;
 
 
-    public String uploadImages(
-            MultipartFile[] files,
-            String userId,
-            String format,
-            OptimizationConfigRequest configRequest
-    ) {
-
-        String batchId = UUID.randomUUID().toString();
-
-        OptimizationConfig config = OptimizationConfig.builder()
-                .quality(configRequest.getQuality())
-                .resizeEnabled(configRequest.getResizeEnabled())
-                .maxWidth(configRequest.getMaxWidth())
-                .maxHeight(configRequest.getMaxHeight())
-                .build();
-
-
-        for (MultipartFile file : files) {
-            uploadSingle(file, userId, batchId, format, config);
-        }
-
-        return batchId;
-    }
-
-
-    private void uploadSingle(
-            MultipartFile file,
-            String userId,
-            String batchId,
-            String format,
-            OptimizationConfig config
-    ) {
-
-        String processingId = UUID.randomUUID().toString();
-
-
-        ImageMetadata metadata = ImageMetadata.builder()
-                .batchId(batchId)
-                .processingId(processingId)
-                .userId(userId)
-                .originalName(file.getOriginalFilename())
-                .format(format)
-                .originalSize(file.getSize())
-                .optimizationConfig(config)
-                .uploadedAt(Instant.now().toString())
-                .status("PENDING")
-                .build();
-
-
-        // Lưu trước để Lambda update sau
-        imageMetadataRepository.save(metadata);
-
-
-        String inputKey = s3Service.upload(
-                file,
-                userId,
-                batchId,
-                processingId
-        );
-
-
-        metadata.setInputBucket(
-                s3Service.getInputBucket()
-        );
-
-        metadata.setInputKey(inputKey);
-
-
-        imageMetadataRepository.update(metadata);
-    }
-
+    // Upload functionality has been moved to API Gateway + Lambda for a serverless architecture.
 
 
     public BatchResponse getBatch(String batchId) {

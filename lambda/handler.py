@@ -555,7 +555,16 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             resize_enabled=resize_enabled,
             output_format=output_format,
             original_key=key
-        )        
+        )
+        if processed_size >= original_size:
+            try:
+                os.remove(optimized_path)  # xóa file optimize vừa tạo
+            except Exception:
+                pass
+
+            optimized_path = input_path
+            processed_size = original_size
+
         log_json(
             "INFO",
             "image_optimized",

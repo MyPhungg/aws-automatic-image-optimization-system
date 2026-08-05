@@ -20,6 +20,7 @@ function GoogleLoginButton() {
             login(
                 result.token ?? "",
                 {
+                    userId: result.userId,
                     name: result.name,
                     email: result.email,
                     avatarUrl: result.avatarUrl

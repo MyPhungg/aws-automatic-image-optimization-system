@@ -21,40 +21,7 @@ public class ImageController {
     private final ImageService imageService;
     private final SecurityUtils securityUtils;
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> upload(
-            @RequestPart("files") MultipartFile[] files,
-            @RequestPart("format") String format,
-            @RequestParam String configReq,
-            Authentication authentication
-
-    ) throws Exception {
-
-//        String userId = "user001";
-
-        String userId = securityUtils.getCurrentUserId(authentication);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        OptimizationConfigRequest config =
-                mapper.readValue(configReq, OptimizationConfigRequest.class);
-        String batchId =
-                imageService.uploadImages(
-                        files,
-                        userId,
-                        format,
-                        config
-                );
-
-
-        return ResponseEntity.ok(
-                Map.of(
-                        "batchId", batchId,
-                        "status", "PROCESSING"
-                )
-        );
-    }
-
+    // Upload is now handled directly by API Gateway -> S3 using presigned URLs.
 
 
     @GetMapping("/batches/{batchId}")

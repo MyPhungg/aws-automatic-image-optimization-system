@@ -194,19 +194,43 @@ function UploadPage() {
             ? images[0]?.preset ?? globalPreset
             : globalPreset;
 
-        const response = await imageService.upload(images.map((image) => image.file), {
-            format: getUploadFormat(images.map((image) => image.file)),
+        const files = images.map((image) => image.file);
+        
+        // Get user info if available in localStorage or use anonymous
+        const userInfo = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}") : {};
+        const userId = userInfo.userId || "anonymous";
+
+        // Step 1: Prepare upload (get presigned URLs)
+        const prepareRes = await imageService.prepareUpload(files, {
+            format: getUploadFormat(files),
             config: getPresetConfig(selectedPreset),
+            userId: userId
         });
 
-        const batchId = response.data.batchId;
+        const batchId = prepareRes.batchId;
+        const fileInfos = prepareRes.files;
 
         setImages((previous) =>
           previous.map((image) => ({
             ...image,
             batchId,
-            status: "PROCESSING" as ImageStatus,
+            status: "UPLOADING" as ImageStatus,
             progress: 10,
+          }))
+        );
+
+        // Step 2: Upload directly to S3
+        await Promise.all(
+            fileInfos.map((info: any, i: number) =>
+                imageService.uploadToS3(files[i], info.presignedUrl)
+            )
+        );
+
+        setImages((previous) =>
+          previous.map((image) => ({
+            ...image,
+            status: "PROCESSING" as ImageStatus,
+            progress: 50,
           }))
         );
 

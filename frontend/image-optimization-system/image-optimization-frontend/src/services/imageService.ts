@@ -9,24 +9,42 @@ interface ImageUploadConfig {
 
 export const imageService = {
 
-    upload(files: File[], options?: { format?: string; config?: ImageUploadConfig }) {
-
-        const formData = new FormData();
-
-        files.forEach((file) => {
-            formData.append("files", file);
-        });
-
-        formData.append("format", options?.format ?? "jpg");
-        formData.append("configReq", JSON.stringify(options?.config ?? {}));
-
-        return api.post("/image/upload", formData, {
+    async prepareUpload(files: File[], options?: { format?: string; config?: ImageUploadConfig, userId?: string }) {
+        const body = {
+            userId: options?.userId || "anonymous",
+            files: files.map(f => ({ fileName: f.name, contentType: f.type, size: f.size })),
+            format: options?.format ?? "JPEG",
+            config: options?.config ?? {}
+        };
+        
+        const apiGwUrl = import.meta.env.VITE_API_GATEWAY_URL || "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod";
+        
+        const response = await fetch(`${apiGwUrl}/upload`, {
+            method: "POST",
             headers: {
-                "Content-Type": "multipart/form-data",
+                "Content-Type": "application/json"
             },
-            withCredentials: true,
+            body: JSON.stringify(body)
         });
+        
+        if (!response.ok) {
+            throw new Error("Failed to prepare upload");
+        }
+        return response.json();
+    },
 
+    async uploadToS3(file: File, presignedUrl: string) {
+        const response = await fetch(presignedUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": file.type
+            },
+            body: file
+        });
+        
+        if (!response.ok) {
+            throw new Error("Failed to upload to S3");
+        }
     },
 
     getBatch(batchId: string) {

@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_apigateway as apigw,
     aws_s3 as s3,
+    aws_dynamodb as _dynamodb,
 )
 from constructs import Construct
 
@@ -12,6 +13,8 @@ class ApiStack(Stack):
     def __init__(
         self, scope: Construct, construct_id: str, 
         original_bucket: s3.Bucket, 
+        metadata_table: _dynamodb.Table,
+        backend_lambda: _lambda.Function,
         **kwargs
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -26,12 +29,14 @@ class ApiStack(Stack):
             timeout=Duration.seconds(10),
             memory_size=256,
             environment={
-                "ORIGINAL_BUCKET": original_bucket.bucket_name
+                "ORIGINAL_BUCKET": original_bucket.bucket_name,
+                "METADATA_TABLE": metadata_table.table_name
             }
         )
 
-        # Grant permissions to generate pre-signed URL (requires PutObject)
+        # Grant permissions
         original_bucket.grant_put(self.upload_api_lambda)
+        metadata_table.grant_read_write_data(self.upload_api_lambda)
 
         # API Gateway REST API
         self.api = apigw.RestApi(
@@ -39,8 +44,10 @@ class ApiStack(Stack):
             rest_api_name="Image Upload Service",
             description="This service handles uploading images to S3.",
             default_cors_preflight_options=apigw.CorsOptions(
-                allow_origins=apigw.Cors.ALL_ORIGINS,
-                allow_methods=apigw.Cors.ALL_METHODS
+                allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8080"], # or apigw.Cors.ALL_ORIGINS
+                allow_methods=apigw.Cors.ALL_METHODS,
+                allow_headers=apigw.Cors.DEFAULT_HEADERS,
+                allow_credentials=True
             )
         )
 
@@ -49,9 +56,19 @@ class ApiStack(Stack):
         self.upload_api_lambda
         )
 
-        # Resource and Method
+        # Resource and Method for Upload Lambda (Python)
         upload_resource = self.api.root.add_resource("upload")
         upload_resource.add_method("POST", upload_integration)
+
+        # Integration for Spring Boot Lambda (Java)
+        spring_boot_integration = apigw.LambdaIntegration(backend_lambda)
+        
+        # Resource and Method for Spring Boot APIs: /api/{proxy+}
+        api_resource = self.api.root.add_resource("api")
+        api_resource.add_proxy(
+            default_integration=spring_boot_integration,
+            any_method=True
+        )
 
         # Export API Gateway URL so sync_backend_env.py can read it from cdk-outputs.json
         CfnOutput(

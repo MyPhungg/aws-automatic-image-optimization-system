@@ -21,6 +21,14 @@ class StorageStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True,
             event_bridge_enabled=True,  # bắt buộc để ProcessingStack's EventBridge Rule nhận được sự kiện
+            cors=[
+                s3.CorsRule(
+                    allowed_methods=[s3.HttpMethods.GET, s3.HttpMethods.PUT, s3.HttpMethods.POST, s3.HttpMethods.HEAD],
+                    allowed_origins=["*"],
+                    allowed_headers=["*"],
+                    max_age=3000
+                )
+            ]
         )
 
         self.optimized_bucket = s3.Bucket(
