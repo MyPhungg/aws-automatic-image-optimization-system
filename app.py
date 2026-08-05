@@ -5,7 +5,8 @@ from aws_automatic_image_optimization_system.stacks import (
     StorageStack,
     ProcessingStack,
     ApiStack,
-    BackendStack
+    BackendStack,
+    AmplifyHostingStack
 )
 
 app = cdk.App()
@@ -45,6 +46,13 @@ api_stack = ApiStack(
     original_bucket=storage_stack.original_bucket,
     metadata_table=storage_stack.table,
     backend_lambda=backend_stack.spring_boot_lambda,
+    env=env
+)
+
+# 5. Frontend Hosting Stack (AWS Amplify)
+amplify_hosting_stack = AmplifyHostingStack(
+    app, "AmplifyHostingStack",
+    api_url=api_stack.api.url,
     env=env
 )
 

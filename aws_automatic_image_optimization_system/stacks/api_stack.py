@@ -44,10 +44,9 @@ class ApiStack(Stack):
             rest_api_name="Image Upload Service",
             description="This service handles uploading images to S3.",
             default_cors_preflight_options=apigw.CorsOptions(
-                allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8080"], # or apigw.Cors.ALL_ORIGINS
+                allow_origins=apigw.Cors.ALL_ORIGINS,
                 allow_methods=apigw.Cors.ALL_METHODS,
                 allow_headers=apigw.Cors.DEFAULT_HEADERS,
-                allow_credentials=True
             )
         )
 
