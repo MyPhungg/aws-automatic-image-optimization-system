@@ -1,0 +1,55 @@
+.auth-input{
+
+    display:flex;
+
+    flex-direction:column;
+
+    margin-bottom:20px;
+
+}
+
+.auth-input label{
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+    color:#374151;
+
+}
+
+.auth-input input{
+
+    height:48px;
+
+    border:1px solid #D1D5DB;
+
+    border-radius:10px;
+
+    padding:0 15px;
+
+    font-size:15px;
+
+    transition:.2s;
+
+}
+
+.auth-input input:focus{
+
+    outline:none;
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+
+}
+
+.input-error{
+
+    color:#DC2626;
+
+    font-size:13px;
+
+    margin-top:6px;
+
+}

@@ -43,8 +43,28 @@ export interface Imageitem {
     status: ImageStatus;
     progress:number;
     createdAt: Date;
+    width: number;
+    height: number;
+    totalPixels: number;
+    hash: string;
+    batchId?: string;
+    processingId?: string;
     optimizedSize?: number;
     optimizedUrl?:string;
     thumbnailUrl?:string;
     errorMessage?: string;
+    result?: ImageResult;
+}
+export interface ImageResult {
+    originalSize?: number;
+
+    optimizedSize?: number;
+
+    compressionRatio?: number;
+
+    processingTimeMs?: number;
+
+    outputUrl?: string;
+    thumbnailUrl?: string;
+    s3Key?: string;
 }

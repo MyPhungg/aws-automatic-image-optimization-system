@@ -1,0 +1,59 @@
+.pagination{
+
+    margin-top:30px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+}
+
+.pagination button{
+
+    min-width:42px;
+
+    height:42px;
+
+    padding:0 15px;
+
+    border:1px solid #D1D5DB;
+
+    background:white;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.pagination button:hover:not(:disabled){
+
+    background:#2563EB;
+
+    color:white;
+
+}
+
+.pagination button:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+}
+
+.active-page{
+
+    background:#2563EB !important;
+
+    color:white;
+
+}

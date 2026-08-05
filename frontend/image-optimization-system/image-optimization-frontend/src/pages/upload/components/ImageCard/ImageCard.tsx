@@ -4,6 +4,8 @@ import { type Imageitem } from "../../../../types/ImageItem";
 import type { CompressionModeType } from "../compressionMode/CompressionMode";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import type { CompressionPreset } from "../../../../types/ImageItem";
+import StatusBadge from "../StatusBadge/StatusBadge";
+import { imageService } from "../../../../services/imageService";
 interface ImageCardProps {
 
     image: Imageitem;
@@ -85,11 +87,21 @@ function ImageCard({
 
                 </p>
 
-                <p>
+                <div className="status-section">
 
-                    <strong>Status:</strong> {image.status}
+                    <p>
 
-                </p>
+                        <strong>Status</strong>
+
+                    </p>
+
+                    <StatusBadge
+
+                        status={image.status}
+
+                    />
+
+                </div>
                 {mode === "CUSTOM" && (
                     <div className="preset-section">
                         <label>Optimization Preset</label>
@@ -112,7 +124,119 @@ function ImageCard({
                 )}
                 <ProgressBar value={image.progress} />
             </div>
+            {
+                image.result && 
+                <div className="result-panel">
+                    <div className="result-item">
+                        <span>
+                            Original Size: 
+                        </span>
+                        <strong>
+                            {formatFileSize(image.result.originalSize || 0)}
+                        </strong>
+                    </div>
+                    <div className="result-item">
+                        <span>
+                            Optimized Size: 
+                        </span>
+                        <strong>
+                            {formatFileSize(image.result.optimizedSize || 0)}
+                        </strong>
+                    </div>
+                    <div className="result-item">
+                        <span>
+                            Compression:  
+                        </span>
+                        <strong>
+                            {formatFileSize(image.result.compressionRatio || 0)} %
+                        </strong>
+                    </div>
+                    <div className="result-item">
+                        <span>
+                            Processing Time: 
+                        </span>
+                        <strong>
+                            {formatFileSize(image.result.processingTimeMs || 0)} ms
+                        </strong>
+                    </div>
+                </div>
+            }
+            {
+                image.status === "SUCCESS" && 
+                <div className="action-group">
+                    <button
+                        className="preview-btn"
+                        onClick={() => {
+                            const url = image.result?.outputUrl ?? image.result?.thumbnailUrl ?? image.optimizedUrl;
+                            if (url) window.open(url, "_blank");
+                        }}
+                    >
+                        Preview
+                    </button>
 
+                    <button
+                        className="download-btn"
+                        onClick={async () => {
+                            try {
+                                const batchId = image.batchId ?? image.id;
+                                const processingId = image.processingId ?? image.id;
+                                const response = await imageService.downloadImage(batchId, processingId);
+
+                                const blob = response.data as Blob;
+                                const blobUrl = window.URL.createObjectURL(blob);
+
+                                const a = document.createElement("a");
+                                // try to derive filename from result URL if available
+                                const deriveName = () => {
+                                    const out = image.result?.outputUrl;
+                                    if (out) {
+                                        try {
+                                            const path = out.split('?')[0];
+                                            const name = path.substring(path.lastIndexOf('/') + 1);
+                                            if (name) return name;
+                                        } catch (_) {}
+                                    }
+                                    return image.name ?? "image.jpg";
+                                };
+
+                                a.href = blobUrl;
+                                a.download = deriveName();
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                window.URL.revokeObjectURL(blobUrl);
+                            } catch (err) {
+                                console.error("Download failed", err);
+                            }
+                        }}
+                    >
+                        Download
+                    </button>
+
+                    <button
+                        className="copy-btn"
+                        onClick={async () => {
+                            const url = image.result?.outputUrl ?? image.result?.thumbnailUrl ?? image.optimizedUrl ?? "";
+                            try {
+                                await navigator.clipboard.writeText(url);
+                            } catch (err) {
+                                console.error("Copy failed", err);
+                            }
+                        }}
+                    >
+                        Copy Link
+                    </button>
+                </div>
+            }
+            {
+            image.status==="FAILED"
+            &&
+            <div className="failed-group">
+            <button>
+            Retry
+            </button>
+            </div>
+            }
             {/* Footer */}
 
             <div className="image-actions">

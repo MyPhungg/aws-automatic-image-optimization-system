@@ -4,8 +4,9 @@
 // ==========================================================
 
 import "./HeroSection.css";
-
+import { useNavigate } from "react-router-dom";
 function HeroSection() {
+    const navigate = useNavigate();
     return (
         <section className="hero">
 
@@ -45,7 +46,7 @@ function HeroSection() {
 
                     <div className="hero-buttons">
 
-                        <button className="primary-btn">
+                        <button className="primary-btn" onClick={() => navigate("/upload")}>
                             Upload Image
                         </button>
 

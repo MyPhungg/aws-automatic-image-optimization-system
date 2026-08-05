@@ -6,8 +6,16 @@ export interface AdminUser {
     userId: string;
     email: string;
     name: string;
+    avatarUrl?: string;
+    role?: string;
+    status?: string;
+    createdAt?: string;
+    lastLogin?: string;
     totalImages: number;
     totalBatches: number;
+    totalSuccess?: number;
+    totalFailed?: number;
+    savedBytes?: number;
 }
 
 export interface AdminImage {

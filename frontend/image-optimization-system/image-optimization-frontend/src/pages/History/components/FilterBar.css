@@ -1,0 +1,43 @@
+.filter-bar{
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+.filter-bar select{
+
+    width:180px;
+
+    height:46px;
+
+    border-radius:10px;
+
+    border:1px solid #D1D5DB;
+
+    padding:0 10px;
+
+}
+
+.filter-bar button{
+
+    width:120px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2563EB;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+.filter-bar button:hover{
+
+    background:#1D4ED8;
+
+}

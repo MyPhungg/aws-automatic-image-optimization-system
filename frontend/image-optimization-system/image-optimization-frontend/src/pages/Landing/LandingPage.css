@@ -1,0 +1,105 @@
+.landing-container{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.landing-card{
+
+    width:650px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:60px;
+
+    text-align:center;
+
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+
+}
+
+.landing-card h1{
+
+    font-size:38px;
+
+    margin-bottom:20px;
+
+    color:#1F2937;
+
+}
+
+.landing-card p{
+
+    color:#6B7280;
+
+    line-height:1.7;
+
+    margin-bottom:40px;
+
+}
+
+.landing-buttons{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+}
+
+.landing-buttons a{
+
+    width:220px;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.guest-btn{
+
+    background:#2563EB;
+
+    color:white;
+
+}
+
+.guest-btn:hover{
+
+    background:#1D4ED8;
+
+}
+
+.login-btn{
+
+    background:white;
+
+    color:#2563EB;
+
+    border:2px solid #2563EB;
+
+}
+
+.login-btn:hover{
+
+    background:#2563EB;
+
+    color:white;
+
+}
