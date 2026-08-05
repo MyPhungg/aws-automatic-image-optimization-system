@@ -21,7 +21,6 @@ class AmplifyHostingStack(Stack):
             "FrontendAmplifyApp",
             name="image-optimization-frontend",
             repository="https://github.com/MyPhungg/aws-automatic-image-optimization-system",
-            access_token="{{resolve:secretsmanager:amplify/github-token:SecretString}}",
             platform="WEB",
             enable_branch_auto_deletion=False,
             environment_variables=[

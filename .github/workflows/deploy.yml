@@ -67,22 +67,12 @@ jobs:
 
       - name: Sync Amplify Secrets
         env:
-          AMPLIFY_GITHUB_TOKEN: ${{ secrets.AMPLIFY_GITHUB_TOKEN }}
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: |
-          if [ -z "$AMPLIFY_GITHUB_TOKEN" ]; then
-            echo "Missing GitHub secret: AMPLIFY_GITHUB_TOKEN"
-            exit 1
-          fi
-
           if [ -z "$VITE_GOOGLE_CLIENT_ID" ]; then
             echo "Missing GitHub secret: VITE_GOOGLE_CLIENT_ID"
             exit 1
           fi
-
-          aws secretsmanager describe-secret --secret-id amplify/github-token >/dev/null 2>&1 \
-            && aws secretsmanager put-secret-value --secret-id amplify/github-token --secret-string "$AMPLIFY_GITHUB_TOKEN" >/dev/null \
-            || aws secretsmanager create-secret --name amplify/github-token --secret-string "$AMPLIFY_GITHUB_TOKEN" >/dev/null
 
           aws secretsmanager describe-secret --secret-id amplify/google-client-id >/dev/null 2>&1 \
             && aws secretsmanager put-secret-value --secret-id amplify/google-client-id --secret-string "$VITE_GOOGLE_CLIENT_ID" >/dev/null \
