@@ -23,7 +23,7 @@ class BackendStack(Stack):
         # Đọc file .env để lấy Secret (trong thực tế CI/CD nên dùng AWS Secrets Manager)
         env_file_path = os.path.join("backend", "image-optimizer", ".env")
         google_client_id = "default_client_id"
-        jwt_secret = "default_jwt_secret"
+        jwt_secret = "default_jwt_secret_must_be_at_least_32_characters_long_for_hmac_sha256"
         
         if os.path.exists(env_file_path):
             with open(env_file_path, "r") as f:

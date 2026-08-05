@@ -43,41 +43,28 @@ public class JwtAuthenticationFilter
         String jwt = getJwtFromCookie(request);
 
 
-        if(jwt != null
-                && SecurityContextHolder
-                .getContext()
-                .getAuthentication() == null) {
-
-
-            String userId =
-                    jwtService.extractUsername(jwt);
-
-
-            String role =
-                    jwtService.extractRole(jwt);
-
-
-            if(userId != null) {
-
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                userId,
-                                null,
-                                List.of(
-                                        new SimpleGrantedAuthority(
-                                                "ROLE_" + role
-                                        )
-                                )
-                        );
-
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(auth);
+        try {
+            if(jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String userId = jwtService.extractUsername(jwt);
+                String role = jwtService.extractRole(jwt);
+                if(userId != null) {
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    userId,
+                                    null,
+                                    List.of(
+                                            new SimpleGrantedAuthority(
+                                                    "ROLE_" + role
+                                            )
+                                    )
+                            );
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            System.err.println("JWT Authentication failed: " + e.getMessage());
         }
-
 
         filterChain.doFilter(
                 request,

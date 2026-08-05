@@ -77,6 +77,7 @@ public class SecurityConfig {
 
 
                         // Các API còn lại
+                        .requestMatchers("/error").permitAll()
                         .anyRequest()
                         .authenticated()
                 )
