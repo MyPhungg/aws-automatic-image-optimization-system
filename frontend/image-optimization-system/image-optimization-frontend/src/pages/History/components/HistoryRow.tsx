@@ -25,6 +25,7 @@ function HistoryRow({item}:Props){
 
     useEffect(() => {
         let mounted = true;
+        setLoading(true);
         dashBoardService.getBatch(item.batchId).then((res) => {
             if (mounted && res.data) {
                 setBatchData(res.data);
@@ -33,7 +34,12 @@ function HistoryRow({item}:Props){
                     setPreset(getPresetName(firstImg.quality));
                 }
             }
-        }).catch((err) => console.error("Failed to fetch batch format", err));
+        }).catch((err) => console.error("Failed to fetch batch format", err))
+            .finally(() => {
+                if (mounted) {
+                    setLoading(false);
+                }
+            });
         return () => { mounted = false; };
     }, [item.batchId]);
 
