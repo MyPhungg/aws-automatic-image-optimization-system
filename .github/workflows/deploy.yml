@@ -105,7 +105,8 @@ jobs:
           npm ci
           npm run build
           cd dist
-          zip -r ../../../../frontend-dist.zip .
+          zip -r "$GITHUB_WORKSPACE/frontend-dist.zip" .
+          unzip -l "$GITHUB_WORKSPACE/frontend-dist.zip"
 
       - name: Deploy Frontend to Amplify
         run: |
@@ -114,8 +115,30 @@ jobs:
           JOB_ID=$(python -c "import json, sys; print(json.loads(sys.argv[1])['jobId'])" "$DEPLOYMENT")
           ZIP_UPLOAD_URL=$(python -c "import json, sys; print(json.loads(sys.argv[1])['zipUploadUrl'])" "$DEPLOYMENT")
 
-          curl -H "Content-Type: application/zip" --upload-file frontend-dist.zip "$ZIP_UPLOAD_URL"
+          curl --fail --show-error --location \
+            -H "Content-Type: application/zip" \
+            --upload-file frontend-dist.zip \
+            "$ZIP_UPLOAD_URL"
+
           aws amplify start-deployment --app-id "$AMPLIFY_APP_ID" --branch-name main --job-id "$JOB_ID"
+
+          for attempt in {1..60}; do
+            STATUS=$(aws amplify get-job --app-id "$AMPLIFY_APP_ID" --branch-name main --job-id "$JOB_ID" --query 'job.summary.status' --output text)
+            echo "Amplify deployment status: $STATUS"
+
+            if [ "$STATUS" = "SUCCEED" ]; then
+              exit 0
+            fi
+
+            if [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "CANCELLED" ]; then
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+          echo "Timed out waiting for Amplify deployment"
+          exit 1
 
       - name: Upload CDK Outputs
         uses: actions/upload-artifact@v4
