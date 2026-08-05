@@ -42,12 +42,7 @@ class ApiStack(Stack):
         self.api = apigw.RestApi(
             self, "ImageUploadApi",
             rest_api_name="Image Upload Service",
-            description="This service handles uploading images to S3.",
-            default_cors_preflight_options=apigw.CorsOptions(
-                allow_origins=apigw.Cors.ALL_ORIGINS,
-                allow_methods=apigw.Cors.ALL_METHODS,
-                allow_headers=apigw.Cors.DEFAULT_HEADERS,
-            )
+            description="This service handles uploading images to S3."
         )
 
         # Integration
@@ -58,6 +53,7 @@ class ApiStack(Stack):
         # Resource and Method for Upload Lambda (Python)
         upload_resource = self.api.root.add_resource("upload")
         upload_resource.add_method("POST", upload_integration)
+        upload_resource.add_method("OPTIONS", upload_integration)
 
         # Integration for Spring Boot Lambda (Java)
         spring_boot_integration = apigw.LambdaIntegration(backend_lambda)

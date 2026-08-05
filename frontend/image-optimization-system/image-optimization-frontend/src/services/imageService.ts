@@ -17,7 +17,8 @@ export const imageService = {
             config: options?.config ?? {}
         };
         
-        const apiGwUrl = import.meta.env.VITE_API_GATEWAY_URL || "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod";
+        const rawApiGwUrl = import.meta.env.VITE_API_GATEWAY_URL || "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod";
+        const apiGwUrl = rawApiGwUrl.replace(/\/+$/, "");
         
         const response = await fetch(`${apiGwUrl}/upload`, {
             method: "POST",
@@ -49,9 +50,7 @@ export const imageService = {
 
     getBatch(batchId: string) {
 
-        return api.get(`/image/batches/${batchId}`, {
-            withCredentials: true,
-        });
+        return api.get(`/image/batches/${batchId}`);
 
     },
 
@@ -59,10 +58,7 @@ export const imageService = {
 
         return api.get(
             `/image/images/${batchId}/${processingId}/download`,
-            {
-                responseType: "blob",
-                withCredentials: true,
-            }
+            { responseType: "blob" }
         );
 
     },
@@ -71,10 +67,7 @@ export const imageService = {
 
         return api.get(
             `/image/batches/${batchId}/download`,
-            {
-                responseType: "blob",
-                withCredentials: true,
-            }
+            { responseType: "blob" }
         );
 
     }

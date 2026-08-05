@@ -18,6 +18,6 @@ export const dashBoardService = {
     },
 
     getBatch(batchId: string) {
-        return api.get(`/image/batches/${batchId}`, { withCredentials: true });
+        return api.get(`/image/batches/${batchId}`);
     }
 };
