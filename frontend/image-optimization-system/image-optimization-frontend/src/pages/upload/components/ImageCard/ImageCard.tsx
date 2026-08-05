@@ -148,7 +148,7 @@ function ImageCard({
                             Compression:  
                         </span>
                         <strong>
-                            {formatFileSize(image.result.compressionRatio || 0)} %
+                            {Number(image.result.compressionRatio || 0).toFixed(2)} %
                         </strong>
                     </div>
                     <div className="result-item">
@@ -156,7 +156,7 @@ function ImageCard({
                             Processing Time: 
                         </span>
                         <strong>
-                            {formatFileSize(image.result.processingTimeMs || 0)} ms
+                            {image.result.processingTimeMs || 0} ms
                         </strong>
                     </div>
                 </div>

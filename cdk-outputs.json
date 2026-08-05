@@ -1,0 +1,18 @@
+{
+  "StorageStack": {
+    "PublishOutputFnGetAttImageMetadata0241C355Arn15A12ADB": "arn:aws:dynamodb:us-east-1:378192010336:table/aws-img-opt-metadata-table",
+    "OriginalImageBucketName": "aws-img-opt-original-bucket",
+    "PublishOutputFnGetAttOriginalImageBucketA5D966F9ArnA27EE2C1": "arn:aws:s3:::aws-img-opt-original-bucket",
+    "PublishOutputFnGetAttOptimizedImageBucketF0C6D668Arn7BDEC439": "arn:aws:s3:::aws-img-opt-optimized-bucket",
+    "PublishOutputRefOriginalImageBucketA5D966F91A6DC80F": "aws-img-opt-original-bucket",
+    "ImageMetadataTableName": "aws-img-opt-metadata-table",
+    "PublishOutputRefOptimizedImageBucketF0C6D66869BE558F": "aws-img-opt-optimized-bucket",
+    "OptimizedImageBucketName": "aws-img-opt-optimized-bucket",
+    "UserMetadataTableName": "aws-img-opt-user-metadata-table",
+    "PublishOutputRefImageMetadata0241C3557B8FB827": "aws-img-opt-metadata-table"
+  },
+  "ApiStack": {
+    "ApiGatewayUrl": "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod/",
+    "ImageUploadApiEndpointBC52FB8E": "https://0cbbc3p01b.execute-api.us-east-1.amazonaws.com/prod/"
+  }
+}

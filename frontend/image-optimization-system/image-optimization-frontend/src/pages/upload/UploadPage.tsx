@@ -136,7 +136,10 @@ function UploadPage() {
       const batchResponse = response.data;
       syncImagesWithBatch(batchResponse);
 
-      const hasProcessing = batchResponse.images?.some((item: { status?: string }) => item.status?.toUpperCase() === "PROCESSING");
+      const hasProcessing = batchResponse.images?.some((item: { status?: string }) => {
+        const s = item.status?.toUpperCase();
+        return s === "PENDING" || s === "PROCESSING" || s === "UPLOADING";
+      });
       if (!hasProcessing) {
         clearPolling();
       }
@@ -254,9 +257,7 @@ function UploadPage() {
           <PresetCards selected={globalPreset} onChange={setGlobalPreset} />
         )}
 
-        <div className="next-step">
-          <button>Continue</button>
-        </div>
+
 
         <UploadSummary
           images={images}

@@ -118,6 +118,7 @@ public class ImageService {
                                         .processedSize(image.getProcessedSize())
                                         .compressionRatio(image.getCompressionRatio())
                                         .format(image.getFormat())
+                                        .quality(image.getOptimizationConfig() != null ? image.getOptimizationConfig().getQuality() : null)
                                         .downloadUrl(
                                                 image.getOutputKey() != null
                                                         ? s3Service.generateDownloadUrl(image.getOutputKey())

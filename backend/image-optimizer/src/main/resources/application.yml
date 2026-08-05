@@ -10,11 +10,11 @@ aws:
   access-key: ${AWS_ACCESS_KEY_ID}
   secret-key: ${AWS_SECRET_ACCESS_KEY}
 dynamodb:
-  image-table: ImageMetadata
-  user-table: UserMetadata
+  image-table: ${DYNAMODB_IMAGE_TABLE}
+  user-table: ${DYNAMODB_USER_TABLE}
 s3:
-  input-bucket: auto-images-input-bucket
-  output-bucket: auto-images-output-bucket
+  input-bucket: ${S3_INPUT_BUCKET}
+  output-bucket: ${S3_OUTPUT_BUCKET}
 
 google:
   client-id: ${GOOGLE_CLIENT_ID}

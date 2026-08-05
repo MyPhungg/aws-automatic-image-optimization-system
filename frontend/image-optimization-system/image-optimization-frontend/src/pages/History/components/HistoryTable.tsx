@@ -23,8 +23,14 @@ function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
                 const res = await dashBoardService.getMyHistory();
                 if (!mounted) return;
                 const data = res.data || [];
+                // Sort by newest upload time
+                data.sort((a: HistoryResponse, b: HistoryResponse) => 
+                    new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+                );
                 setHistory(data);
-                onTotalItemsChange && onTotalItemsChange(data.length);
+                if (onTotalItemsChange) {
+                    onTotalItemsChange(data.length);
+                }
             } catch (err: any) {
                 console.error(err);
                 setError(err?.message ?? "Failed to load history");
@@ -45,53 +51,35 @@ function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
     const pageItems = history.slice(start, end);
 
     return(
-
         <div className="history-table-wrapper">
-
             <table className="history-table">
-
                 <thead>
-
                     <tr>
-
                         <th>Batch ID</th>
-
                         <th>Uploaded At</th>
-
+                        <th>Preset</th>
                         <th>Total</th>
-
                         <th>Success</th>
-
                         <th>Failed</th>
-
                         <th>Action</th>
-
                     </tr>
-
                 </thead>
-
                 <tbody>
-
                     {loading ? (
-                        <tr><td colSpan={6}>Loading...</td></tr>
+                        <tr><td colSpan={7}>Loading...</td></tr>
                     ) : error ? (
-                        <tr><td colSpan={6} style={{color:'red'}}>{error}</td></tr>
+                        <tr><td colSpan={7} style={{color:'red'}}>{error}</td></tr>
                     ) : pageItems.length === 0 ? (
-                        <tr><td colSpan={6}>No history found.</td></tr>
+                        <tr><td colSpan={7}>No history found.</td></tr>
                     ) : (
                         pageItems.map(item => (
-                            <HistoryRow key={item.batchId} item={item as any} />
+                            <HistoryRow key={item.batchId} item={item} />
                         ))
                     )}
-
                 </tbody>
-
             </table>
-
         </div>
-
     );
-
 }
 
 export default HistoryTable;

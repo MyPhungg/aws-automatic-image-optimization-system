@@ -24,6 +24,8 @@ public class BatchImageResponse {
 
     private String format;
 
+    private Integer quality;
+
     private String downloadUrl;
 
     private String thumbnailUrl;
