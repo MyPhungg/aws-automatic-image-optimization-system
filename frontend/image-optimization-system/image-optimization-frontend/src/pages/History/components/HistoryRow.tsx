@@ -117,15 +117,28 @@ function HistoryRow({item}:Props){
                             <button className="history-btn history-btn-secondary" onClick={closeModal}>
                                 Close
                             </button>
-                            {firstSuccessImage && (
-                                <a 
-                                    href={firstSuccessImage.downloadUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
+                            {batchData?.images?.some((img: any) => img.status === 'SUCCESS') && (
+                                <button 
                                     className="history-btn history-btn-primary"
+                                    onClick={async () => {
+                                        try {
+                                            const response = await (await import("../../../services/imageService")).imageService.downloadBatch(item.batchId);
+                                            const blob = response.data as Blob;
+                                            const blobUrl = window.URL.createObjectURL(blob);
+                                            const a = document.createElement("a");
+                                            a.href = blobUrl;
+                                            a.download = `batch-${item.batchId}.zip`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            a.remove();
+                                            window.URL.revokeObjectURL(blobUrl);
+                                        } catch (err) {
+                                            console.error("Download failed", err);
+                                        }
+                                    }}
                                 >
-                                    Download
-                                </a>
+                                    Download All
+                                </button>
                             )}
                         </div>
                     </div>

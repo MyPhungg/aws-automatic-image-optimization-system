@@ -21,7 +21,7 @@ function Footer() {
                 </div>
                 {/* Copyright */}
                 <div className="footer-copy">
-                    <span>Copyright © 2024 Automatic Image Optimization System</span>
+                    <span>Copyright © 2026 Automatic Image Optimization System</span>
                 </div>
             </div>   
         </footer>

@@ -56,7 +56,7 @@ function HistoryPage() {
 
             </div>
 
-            <HistoryHeader />
+            <HistoryHeader totalItems={totalItems} />
             <HistoryTable currentPage={currentPage} pageSize={pageSize} onTotalItemsChange={setTotalItems} />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}/>
         </div>

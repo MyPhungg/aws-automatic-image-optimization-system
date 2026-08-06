@@ -78,133 +78,23 @@ function LoginForm() {
 // }
 
     return (
-
         <AuthCard>
-
             <div className="login-header">
-
-                <h1>
-
-                    Welcome Back
-
-                </h1>
-
-                <p>
-
-                    Sign in to continue.
-
-                </p>
-
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue.</p>
             </div>
 
-            <AuthInput
-
-                label="Email Address"
-
-                value={email}
-
-                placeholder="example@email.com"
-
-                onChange={setEmail}
-
-                error={emailError}
-
-            />
-
-            <AuthInput
-
-                label="Password"
-
-                type="password"
-
-                value={password}
-
-                placeholder="Enter your password"
-
-                onChange={setPassword}
-
-                error={passwordError}
-
-            />
-
-            <div className="login-options">
-
-                <label className="remember">
-
-                    <input
-
-                        type="checkbox"
-
-                        checked={remember}
-
-                        onChange={(e) =>
-
-                            setRemember(e.target.checked)
-
-                        }
-
-                    />
-
-                    Remember me
-
-                </label>
-
-                <Link
-
-                    to="/forgot-password"
-
-                    className="forgot"
-
-                >
-
-                    Forgot Password?
-
-                </Link>
-
-            </div>
-
-            <AuthButton
-
-                text="Login"
-
-                loading={loading}
-
-                onClick={handleLogin}
-
-            />
-
-            <AuthDivider />
             <GoogleLoginButton />
-            <div className="bottom-links">
-
-                <p>
-
-                    Don't have an account?
-
-                </p>
-
-                <Link to="/register">
-
-                    Create Account
-
-                </Link>
-
+            
+            <div className="bottom-links" style={{ marginTop: '20px' }}>
+                <p>Don't have an account?</p>
+                <Link to="/register">Create Account</Link>
             </div>
 
-            <Link
-
-                to="/upload"
-
-                className="guest-link"
-
-            >
-
+            <Link to="/upload" className="guest-link">
                 Continue as Guest
-
             </Link>
-
         </AuthCard>
-
     );
 
 }

@@ -165,16 +165,6 @@ function ImageCard({
                 image.status === "SUCCESS" && 
                 <div className="action-group">
                     <button
-                        className="preview-btn"
-                        onClick={() => {
-                            const url = image.result?.outputUrl ?? image.result?.thumbnailUrl ?? image.optimizedUrl;
-                            if (url) window.open(url, "_blank");
-                        }}
-                    >
-                        Preview
-                    </button>
-
-                    <button
                         className="download-btn"
                         onClick={async () => {
                             try {
@@ -211,20 +201,6 @@ function ImageCard({
                         }}
                     >
                         Download
-                    </button>
-
-                    <button
-                        className="copy-btn"
-                        onClick={async () => {
-                            const url = image.result?.outputUrl ?? image.result?.thumbnailUrl ?? image.optimizedUrl ?? "";
-                            try {
-                                await navigator.clipboard.writeText(url);
-                            } catch (err) {
-                                console.error("Copy failed", err);
-                            }
-                        }}
-                    >
-                        Copy Link
                     </button>
                 </div>
             }

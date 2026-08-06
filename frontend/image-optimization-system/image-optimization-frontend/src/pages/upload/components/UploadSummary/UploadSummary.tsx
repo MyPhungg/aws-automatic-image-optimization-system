@@ -235,19 +235,38 @@ function UploadSummary({
             </div>
 
             <button
-
                 className="start-btn"
-
                 onClick={onStart}
-
                 disabled={images.length===0}
-
             >
-
                 Start Optimization
-
             </button>
 
+            {images.some(img => img.status === "SUCCESS") && images[0]?.batchId && (
+                <button
+                    className="start-btn"
+                    style={{ marginTop: '10px', backgroundColor: '#28a745' }}
+                    onClick={async () => {
+                        try {
+                            const batchId = images[0].batchId!;
+                            const response = await (await import("../../../../services/imageService")).imageService.downloadBatch(batchId);
+                            const blob = response.data as Blob;
+                            const blobUrl = window.URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = blobUrl;
+                            a.download = `batch-${batchId}.zip`;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(blobUrl);
+                        } catch (err) {
+                            console.error("Download failed", err);
+                        }
+                    }}
+                >
+                    Download All
+                </button>
+            )}
         </section>
 
     );

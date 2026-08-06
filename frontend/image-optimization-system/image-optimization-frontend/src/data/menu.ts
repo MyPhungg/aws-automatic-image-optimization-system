@@ -45,19 +45,7 @@ export const userMenu: MenuItem[] = [
     },
 
     {
-
         title: "History",
-
         path: "/history"
-
-    },
-
-    {
-
-        title: "Settings",
-
-        path: "/settings"
-
     }
-
 ];
