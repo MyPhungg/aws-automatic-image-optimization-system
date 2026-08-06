@@ -1,31 +1,9 @@
 import "./LoginForm.css";
-
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthCard from "../../../components/Auth/AuthCard";
-import AuthInput from "../../../components/Auth/AuthInput";
-import AuthButton from "../../../components/Auth/AuthButton";
-import AuthDivider from "../../../components/Auth/AuthDivider";
 import GoogleLoginButton from "../../../components/Auth/GoogleLoginButton";
+
 function LoginForm() {
-
-    const [email, setEmail] = useState("");
-
-    const [password, setPassword] = useState("");
-
-    const [remember, setRemember] = useState(false);
-
-    const [loading] = useState(false);
-
-    const [emailError] = useState("");
-
-    const [passwordError] = useState("");
-
-    function handleLogin() {
-
-    alert("Email login is not available yet. Please use Google Sign-In.");
-
-}
 
 //     async function handleLogin() {
 

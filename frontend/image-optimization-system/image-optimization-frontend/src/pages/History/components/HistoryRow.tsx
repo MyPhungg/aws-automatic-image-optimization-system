@@ -58,7 +58,6 @@ function HistoryRow({item}:Props){
         return `${(size / 1024 / 1024).toFixed(2)} MB`;
     };
 
-    const firstSuccessImage = batchData?.images?.find((img: any) => img.status === 'SUCCESS' && img.downloadUrl);
 
     return(
         <>
