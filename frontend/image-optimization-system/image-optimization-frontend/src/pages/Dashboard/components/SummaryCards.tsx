@@ -13,7 +13,6 @@ function formatBytes(bytes: number) {
 }
 
 function SummaryCards() {
-
     const [stats, setStats] = useState({
         totalImages: 0,
         storageSaved: 0,
@@ -81,25 +80,21 @@ function SummaryCards() {
             title: "Total Images",
             value: String(stats.totalImages),
             subtitle: "All time",
-            icon: "📷",
         },
         {
             title: "Storage Saved",
             value: formatBytes(stats.storageSaved),
             subtitle: "Total saved",
-            icon: "💾",
         },
         {
             title: "Avg Compression",
             value: `${stats.avgCompression}%`,
             subtitle: stats.avgCompression >= 50 ? "Excellent" : "Good",
-            icon: "⚡",
         },
         {
             title: "Success Rate",
             value: `${stats.successRate}%`,
             subtitle: stats.successRate >= 95 ? "Stable" : "Check logs",
-            icon: "✅",
         },
     ];
 
@@ -111,11 +106,10 @@ function SummaryCards() {
                     title={card.title}
                     value={card.value}
                     subtitle={card.subtitle}
-                    icon={card.icon}
                 />
             ))}
         </div>
     );
 }
 
-export default SummaryCards;
+export default SummaryCards;

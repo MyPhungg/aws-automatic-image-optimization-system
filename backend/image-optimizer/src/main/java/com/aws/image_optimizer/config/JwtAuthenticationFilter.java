@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter
             throws ServletException, IOException {
 
 
-        String jwt = getJwtFromCookie(request);
+        String jwt = getJwtFromToken(request);
 
 
         try {
@@ -72,25 +72,20 @@ public class JwtAuthenticationFilter
         );
     }
 
-
-
-    private String getJwtFromCookie(
+    private String getJwtFromToken(
             HttpServletRequest request
     ){
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
 
-        Cookie[] cookies =
-                request.getCookies();
-
-
+        Cookie[] cookies = request.getCookies();
         if(cookies == null)
             return null;
 
-
         for(Cookie cookie : cookies){
-
-            if(cookie.getName()
-                    .equals("access_token")){
-
+            if(cookie.getName().equals("access_token")){
                 return cookie.getValue();
             }
         }

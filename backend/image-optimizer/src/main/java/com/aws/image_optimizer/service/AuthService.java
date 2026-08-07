@@ -5,10 +5,12 @@ import com.aws.image_optimizer.entity.User;
 import com.aws.image_optimizer.repository.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -51,13 +53,14 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtService.generateToken(user);
-
+        log.info("DynamoDB User loaded/saved: userId={}, email={}, role={}", user.getUserId(), user.getEmail(), user.getRole());
         return AuthResponse.builder()
                 .token(token)
                 .userId(user.getUserId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .avatarUrl(user.getAvatarUrl())
+                .role(user.getRole())
                 .build();
     }
 }

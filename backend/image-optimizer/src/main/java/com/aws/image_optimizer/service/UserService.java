@@ -17,110 +17,84 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final ImageMetadataRepository imageRepository;
+        private final UserRepository userRepository;
+        private final ImageMetadataRepository imageRepository;
 
-    public List<HistoryResponse> getHistory(String userId) {
+        public List<HistoryResponse> getHistory(String userId) {
 
-        List<ImageMetadata> images =
-                imageRepository.findByUserId(userId);
+                List<ImageMetadata> images = imageRepository.findByUserId(userId);
 
+                return images.stream()
+                                .collect(Collectors.groupingBy(
+                                                ImageMetadata::getBatchId))
+                                .values()
+                                .stream()
+                                .map(list -> {
 
-        return images.stream()
-                .collect(Collectors.groupingBy(
-                        ImageMetadata::getBatchId
-                ))
-                .values()
-                .stream()
-                .map(list -> {
+                                        long success = list.stream()
+                                                        .filter(i -> "SUCCESS".equals(i.getStatus()))
+                                                        .count();
 
-                    long success =
-                            list.stream()
-                                    .filter(i ->
-                                            "SUCCESS".equals(i.getStatus())
-                                    )
-                                    .count();
+                                        long failed = list.stream()
+                                                        .filter(i -> "FAILED".equals(i.getStatus()))
+                                                        .count();
 
+                                        return HistoryResponse.builder()
+                                                        .batchId(
+                                                                        list.get(0).getBatchId())
+                                                        .uploadedAt(
+                                                                        list.get(0).getUploadedAt())
+                                                        .totalImages(
+                                                                        list.size())
+                                                        .successImages(
+                                                                        (int) success)
+                                                        .failedImages(
+                                                                        (int) failed)
+                                                        .build();
 
-                    long failed =
-                            list.stream()
-                                    .filter(i ->
-                                            "FAILED".equals(i.getStatus())
-                                    )
-                                    .count();
+                                })
+                                .toList();
+        }
 
+        public List<UserUsageResponse> getUsersUsage() {
 
-                    return HistoryResponse.builder()
-                            .batchId(
-                                    list.get(0).getBatchId()
-                            )
-                            .uploadedAt(
-                                    list.get(0).getUploadedAt()
-                            )
-                            .totalImages(
-                                    list.size()
-                            )
-                            .successImages(
-                                    (int) success
-                            )
-                            .failedImages(
-                                    (int) failed
-                            )
-                            .build();
+                List<User> users = userRepository.findAll();
 
-                })
-                .toList();
-    }
-    public List<UserUsageResponse> getUsersUsage() {
+                return users.stream()
+                                .map(user -> {
 
-        List<User> users =
-                userRepository.findAll();
+                                        List<ImageMetadata> images = imageRepository.findByUserId(
+                                                        user.getUserId());
 
+                                        long batches = images.stream()
+                                                        .map(ImageMetadata::getBatchId)
+                                                        .distinct()
+                                                        .count();
 
-        return users.stream()
-                .map(user -> {
+                                        return UserUsageResponse.builder()
+                                                        .userId(user.getUserId())
+                                                        .email(user.getEmail())
+                                                        .name(user.getName())
+                                                        .totalImages(
+                                                                        (long) images.size())
+                                                        .totalBatches(
+                                                                        batches)
+                                                        .build();
 
-                    List<ImageMetadata> images =
-                            imageRepository.findByUserId(
-                                    user.getUserId()
-                            );
+                                })
+                                .toList();
+        }
 
+        public User findById(String id) {
 
-                    long batches =
-                            images.stream()
-                                    .map(ImageMetadata::getBatchId)
-                                    .distinct()
-                                    .count();
+                return userRepository.findById(id);
 
+        }
 
-                    return UserUsageResponse.builder()
-                            .userId(user.getUserId())
-                            .email(user.getEmail())
-                            .name(user.getName())
-                            .totalImages(
-                                    (long) images.size()
-                            )
-                            .totalBatches(
-                                    batches
-                            )
-                            .build();
+        public void save(User user) {
 
-                })
-                .toList();
-    }
+                userRepository.save(user);
 
-
-
-    public User findById(String id){
-
-        return userRepository.findById(id);
-
-    }
-
-    public void save(User user){
-
-        userRepository.save(user);
-
-    }
+        }
 
 }

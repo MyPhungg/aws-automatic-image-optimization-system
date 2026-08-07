@@ -14,55 +14,51 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    private final SecurityUtils securityUtils;
-    @GetMapping
-    public ResponseEntity<?> history(
-            Authentication authentication
-    ) {
+        private final UserService userService;
+        private final SecurityUtils securityUtils;
 
-//        String userId ="user001";
-        String userId = securityUtils.getCurrentUserId(authentication);
+        @GetMapping
+        public ResponseEntity<?> history(
+                        Authentication authentication) {
 
+                // String userId ="user001";
+                String userId = securityUtils.getCurrentUserId(authentication);
 
-        return ResponseEntity.ok(
-                userService.getHistory(userId)
-        );
-    }
+                return ResponseEntity.ok(
+                                userService.getHistory(userId));
+        }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> users() {
+        @GetMapping("/all")
+        public ResponseEntity<?> users() {
 
-        return ResponseEntity.ok(
-                userService.getUsersUsage()
-        );
-    }
+                return ResponseEntity.ok(
+                                userService.getUsersUsage());
+        }
 
+        @GetMapping("/{id}")
+        public User get(@PathVariable String id) {
 
-    @GetMapping("/{id}")
-    public User get(@PathVariable String id) {
+                return userService.findById(id);
 
-        return userService.findById(id);
+        }
 
-    }
+        @PostMapping("/test")
+        public String saveTestUser() {
 
-    @PostMapping("/test")
-    public String saveTestUser() {
+                User user = User.builder()
+                                .userId("123456")
+                                .email("test@gmail.com")
+                                .name("Test User")
+                                .avatarUrl("https://abc.com/avatar.png")
+                                .role("USER")
+                                .status("ACTIVE")
+                                .createdAt(LocalDateTime.now().toString())
+                                .lastLogin(LocalDateTime.now().toString())
+                                .build();
 
-        User user = User.builder()
-                .userId("123456")
-                .email("test@gmail.com")
-                .name("Test User")
-                .avatarUrl("https://abc.com/avatar.png")
-                .role("USER")
-                .status("ACTIVE")
-                .createdAt(LocalDateTime.now().toString())
-                .lastLogin(LocalDateTime.now().toString())
-                .build();
+                userService.save(user);
 
-        userService.save(user);
-
-        return "Save Success";
-    }
+                return "Save Success";
+        }
 
 }

@@ -23,7 +23,8 @@ function GoogleLoginButton() {
                     userId: result.userId,
                     name: result.name,
                     email: result.email,
-                    avatarUrl: result.avatarUrl
+                    avatarUrl: result.avatarUrl,
+                    role: result.role
                 }
             );
 

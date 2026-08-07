@@ -17,4 +17,6 @@ public class AuthResponse {
 
     private String avatarUrl;
 
+    private String role;
+
 }

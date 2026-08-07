@@ -57,3 +57,14 @@
     gap:16px;
 
 }
+
+.recent-empty {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 32px 20px;
+    text-align: center;
+    color: #6B7280;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 5px 15px rgba(0,0,0,.05);
+}

@@ -183,7 +183,7 @@ export function formatBytes(bytes: number): string {
 }
 
 export function formatDate(iso: string): string {
-    return new Date(iso).toLocaleString("vi-VN", {
+    return new Date(iso).toLocaleString("en-US", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -195,8 +195,8 @@ export function formatDate(iso: string): string {
 export function timeAgo(iso: string): string {
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60_000);
-    if (mins < 60) return `${mins} phút trước`;
+    if (mins < 60) return `${mins} mins ago`;
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} giờ trước`;
-    return `${Math.floor(hours / 24)} ngày trước`;
+    if (hours < 24) return `${hours} hours ago`;
+    return `${Math.floor(hours / 24)} days ago`;
 }

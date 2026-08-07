@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { guestMenu, userMenu } from '../../data/menu';
+import { getMenuItems } from '../../data/menu';
 
 function Navigation() {
-    const { isAuthenticated } = useAuth();
-    const menus = isAuthenticated ? userMenu : guestMenu;
+    const { isAuthenticated, user } = useAuth();
+    const menus = getMenuItems(isAuthenticated, user?.role);
 
     return (
         <nav className="navigation">

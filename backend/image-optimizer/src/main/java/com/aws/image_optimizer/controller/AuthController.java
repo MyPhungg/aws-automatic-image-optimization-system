@@ -38,8 +38,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
@@ -79,16 +82,25 @@ public class AuthController {
 
         response.addCookie(cookie);
 
+        LoginResult result = LoginResult.builder()
+                .userId(authResponse.getUserId())
+                .token(authResponse.getToken())
+                .email(authResponse.getEmail())
+                .name(authResponse.getName())
+                .avatarUrl(authResponse.getAvatarUrl())
+                .role(authResponse.getRole())
+                .build();
 
-        return ResponseEntity.ok(
-                LoginResult.builder()
-                        .userId(authResponse.getUserId())
-                        .token(authResponse.getToken())
-                        .email(authResponse.getEmail())
-                        .name(authResponse.getName())
-                        .avatarUrl(authResponse.getAvatarUrl())
-                        .build()
-        );
+        log.info("========== [LOGIN RESPONSE DATA] ==========");
+        log.info("User ID   : {}", result.getUserId());
+        log.info("Email     : {}", result.getEmail());
+        log.info("Name      : {}", result.getName());
+        log.info("Role      : {}", result.getRole());
+        log.info("Avatar URL: {}", result.getAvatarUrl());
+        log.info("Token     : {}", result.getToken() != null ? "[PRESENT]" : "[NULL]");
+        log.info("===========================================");
+
+        return ResponseEntity.ok(result);
     }
     @PostMapping("/logout")
     public ResponseEntity<?> logout(
@@ -98,7 +110,7 @@ public class AuthController {
         Cookie cookie =
                 new Cookie(
                         "access_token",
-                        null
+                        ""
                 );
 
         cookie.setHttpOnly(true);

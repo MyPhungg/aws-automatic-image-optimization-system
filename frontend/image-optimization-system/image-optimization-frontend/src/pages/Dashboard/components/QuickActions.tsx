@@ -40,18 +40,6 @@ function QuickActions(){
 
                 />
 
-                <QuickActionCard
-
-                    title="Settings"
-
-                    description="Manage application settings."
-
-                    icon="⚙"
-
-                    path="/settings"
-
-                />
-
             </div>
 
         </section>

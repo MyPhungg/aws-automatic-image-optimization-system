@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import type { User } from "../types/User";
+import { authService } from "../services/authService";
 
 interface AuthContextType {
 
@@ -92,7 +93,9 @@ export function AuthProvider({
     };
 
     // Logout
-    const logout = () => {
+    const logout = async () => {
+
+        await authService.logout();
 
         localStorage.removeItem("token");
 

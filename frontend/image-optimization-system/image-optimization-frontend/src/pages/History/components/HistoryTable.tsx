@@ -1,18 +1,33 @@
 import "./HistoryTable.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import HistoryRow from "./HistoryRow";
 import { dashBoardService, type HistoryResponse } from "../../../services/dashBoardService";
 
 interface Props {
+    search: string;
+    status: string;
+    preset: string;
     currentPage: number;
     pageSize: number;
     onTotalItemsChange?: (total: number) => void;
 }
 
-function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
+interface EnrichedHistory extends HistoryResponse {
+    images?: any[];
+    computedPreset?: string;
+    computedStatus?: string;
+}
 
-    const [history, setHistory] = useState<HistoryResponse[]>([]);
+export function getPresetName(quality?: number) {
+    if (!quality) return "Balanced";
+    if (quality >= 95) return "High Quality";
+    if (quality >= 80) return "Balanced";
+    return "Storage Saver";
+}
+
+function HistoryTable({ search, status, preset, currentPage, pageSize, onTotalItemsChange }: Props) {
+    const [rawHistory, setRawHistory] = useState<EnrichedHistory[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -27,13 +42,44 @@ function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
                 data.sort((a: HistoryResponse, b: HistoryResponse) => 
                     new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
                 );
-                setHistory(data);
-                if (onTotalItemsChange) {
-                    onTotalItemsChange(data.length);
+
+                const enriched: EnrichedHistory[] = await Promise.all(
+                    data.map(async (item: HistoryResponse) => {
+                        let images: any[] = [];
+                        let computedPreset = "Balanced";
+                        try {
+                            const bRes = await dashBoardService.getBatch(item.batchId);
+                            images = bRes.data?.images || [];
+                            const firstImg = images[0];
+                            if (firstImg?.quality) {
+                                computedPreset = getPresetName(firstImg.quality);
+                            }
+                        } catch (e) {
+                            // ignore batch fetch errors
+                        }
+
+                        let computedStatus = "Completed";
+                        if (item.failedImages > 0) {
+                            computedStatus = "Failed";
+                        } else if (item.successImages < item.totalImages) {
+                            computedStatus = "Processing";
+                        }
+
+                        return {
+                            ...item,
+                            images,
+                            computedPreset,
+                            computedStatus,
+                        };
+                    })
+                );
+
+                if (mounted) {
+                    setRawHistory(enriched);
                 }
             } catch (err: any) {
                 console.error(err);
-                setError(err?.message ?? "Failed to load history");
+                if (mounted) setError(err?.message ?? "Failed to load history");
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -44,20 +90,57 @@ function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
         return () => {
             mounted = false;
         };
-    }, [onTotalItemsChange]);
+    }, []);
+
+    const filteredHistory = useMemo(() => {
+        return rawHistory.filter(item => {
+            // Search filter
+            if (search.trim()) {
+                const query = search.trim().toLowerCase();
+                const matchBatchId = item.batchId.toLowerCase().includes(query);
+                const matchImageName = item.images?.some(img => 
+                    img.originalName?.toLowerCase().includes(query)
+                );
+                if (!matchBatchId && !matchImageName) {
+                    return false;
+                }
+            }
+
+            // Status filter
+            if (status !== "ALL") {
+                if (item.computedStatus !== status) {
+                    return false;
+                }
+            }
+
+            // Preset filter
+            if (preset !== "ALL") {
+                if (item.computedPreset !== preset && item.computedPreset !== (preset === "Storage Saver" ? "Save Space" : preset)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }, [rawHistory, search, status, preset]);
+
+    useEffect(() => {
+        if (onTotalItemsChange) {
+            onTotalItemsChange(filteredHistory.length);
+        }
+    }, [filteredHistory.length, onTotalItemsChange]);
 
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
-    const pageItems = history.slice(start, end);
+    const pageItems = filteredHistory.slice(start, end);
 
-    return(
+    return (
         <div className="history-table-wrapper">
             <table className="history-table">
                 <thead>
                     <tr>
                         <th>Batch ID</th>
                         <th>Uploaded At</th>
-                        <th>Preset</th>
                         <th>Total</th>
                         <th>Success</th>
                         <th>Failed</th>
@@ -66,11 +149,11 @@ function HistoryTable({ currentPage, pageSize, onTotalItemsChange }: Props){
                 </thead>
                 <tbody>
                     {loading ? (
-                        <tr><td colSpan={7}>Loading...</td></tr>
+                        <tr><td colSpan={6}>Loading...</td></tr>
                     ) : error ? (
-                        <tr><td colSpan={7} style={{color:'red'}}>{error}</td></tr>
+                        <tr><td colSpan={6} style={{ color: 'red' }}>{error}</td></tr>
                     ) : pageItems.length === 0 ? (
-                        <tr><td colSpan={7}>No history found.</td></tr>
+                        <tr><td colSpan={6}>No history found.</td></tr>
                     ) : (
                         pageItems.map(item => (
                             <HistoryRow key={item.batchId} item={item} />

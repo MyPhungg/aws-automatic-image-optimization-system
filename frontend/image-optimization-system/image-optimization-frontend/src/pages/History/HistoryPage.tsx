@@ -7,11 +7,9 @@ import FilterBar from "./components/FilterBar";
 import HistoryTable from "./components/HistoryTable";
 import Pagination from "./components/Pagination";
 function HistoryPage() {
-    const [search,setSearch]=useState("");
-
-    const [status,setStatus]=useState("ALL");
-
-    const [preset,setPreset]=useState("ALL");
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("ALL");
+    const [preset, setPreset] = useState("ALL");
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(10);
@@ -20,49 +18,47 @@ function HistoryPage() {
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
     return (
-
         <div className="history-page">
             <div className="history-toolbar">
-
                 <SearchBar
-
                     value={search}
-
-                    onChange={setSearch}
-
-                />
-
-                <FilterBar
-
-                    status={status}
-
-                    preset={preset}
-
-                    onStatusChange={setStatus}
-
-                    onPresetChange={setPreset}
-
-                    onReset={() => {
-
-                        setSearch("");
-
-                        setStatus("ALL");
-
-                        setPreset("ALL");
-
+                    onChange={(val) => {
+                        setSearch(val);
+                        setCurrentPage(1);
                     }}
-
                 />
-
+                <FilterBar
+                    status={status}
+                    preset={preset}
+                    onStatusChange={(val) => {
+                        setStatus(val);
+                        setCurrentPage(1);
+                    }}
+                    onPresetChange={(val) => {
+                        setPreset(val);
+                        setCurrentPage(1);
+                    }}
+                    onReset={() => {
+                        setSearch("");
+                        setStatus("ALL");
+                        setPreset("ALL");
+                        setCurrentPage(1);
+                    }}
+                />
             </div>
 
             <HistoryHeader totalItems={totalItems} />
-            <HistoryTable currentPage={currentPage} pageSize={pageSize} onTotalItemsChange={setTotalItems} />
+            <HistoryTable
+                search={search}
+                status={status}
+                preset={preset}
+                currentPage={currentPage}
+                pageSize={pageSize}
+                onTotalItemsChange={setTotalItems}
+            />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage}/>
         </div>
-
     );
-
 }
 
 export default HistoryPage;

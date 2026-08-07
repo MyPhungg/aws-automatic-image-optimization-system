@@ -14,4 +14,6 @@ public class LoginResult {
     private String name;
 
     private String avatarUrl;
+
+    private String role;
 }
