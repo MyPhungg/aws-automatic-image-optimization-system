@@ -8,10 +8,8 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Tuple
 from decimal import Decimal
 
-
 import boto3
 from PIL import Image, ImageOps
-
 
 # AWS clients
 s3 = boto3.client("s3")
@@ -19,11 +17,11 @@ dynamodb = boto3.resource("dynamodb")
 
 
 # Configuration (can be overridden with environment variables)
-OUTPUT_BUCKET: str = os.getenv("OUTPUT_BUCKET", "OptimizedImageBucket") #đây nè
+OUTPUT_BUCKET: str = os.getenv("OUTPUT_BUCKET", "auto-images-output-bucket") #đây nè
 MAX_WIDTH: int = int(os.getenv("MAX_WIDTH", "1024"))
 JPEG_QUALITY: int = int(os.getenv("JPEG_QUALITY", "80"))
 THUMB_SIZE: Tuple[int, int] = (150, 150)
-SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP", "BMP", "TIFF","JPG","MPO"}
+SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP", "BMP", "TIFF"}
 METADATA_TABLE = os.getenv("METADATA_TABLE", "ImageMetadata")
 
 
@@ -36,14 +34,22 @@ if not logger.handlers:
 
 
 
+
 class ImageProcessingError(Exception):
     """Base exception for image processing errors."""
+
+
+
 
 class UnsupportedFormatError(ImageProcessingError):
     """Raised when an input image format is not supported."""
 
+
+
+
 def log_json(level: str, message: str, **extra: Any) -> None:
     """Emit a single-line JSON structured log entry.
+
 
     The log includes a timestamp and any extra key/value pairs passed in.
     """
@@ -57,16 +63,24 @@ def log_json(level: str, message: str, **extra: Any) -> None:
     logger.info(json.dumps(payload, default=str))
 
 
+
+
 def build_metadata(**kwargs: Any) -> Dict[str, Any]:
     """Build canonical metadata dictionary for processed images.
+
+
     Fields follow the group's schema and are intentionally flat to make
     it easy to persist in DynamoDB or other stores without further
     transformation.
     """
     return kwargs
 
+
+
+
 def download_s3_file(bucket: str, key: str) -> str:
     """Download S3 object to a temporary local file and return its path.
+
 
     Raises ImageProcessingError on failure.
     """
@@ -80,6 +94,8 @@ def download_s3_file(bucket: str, key: str) -> str:
         raise ImageProcessingError(f"Failed to download s3://{bucket}/{key}: {exc}")
 
 
+
+
 def upload_s3_file(local_path: str, bucket: str, key: str) -> None:
     """Upload a local file to S3. Raises ImageProcessingError on failure."""
     try:
@@ -88,15 +104,16 @@ def upload_s3_file(local_path: str, bucket: str, key: str) -> None:
         raise ImageProcessingError(f"Failed to upload {local_path} to s3://{bucket}/{key}: {exc}")
 
 
+
+
 def optimize_image(
     input_path: str,
-    max_width: int = MAX_WIDTH,
-    quality: int = JPEG_QUALITY,
-    original_key: str = "",  # Thêm tham số này để fallback extension từ S3 Key
+    max_width: int,
+    quality: int,
+    resize_enabled: bool,
+    output_format: str,
+    original_key: str = ""
 ) -> Tuple[str, int, str]:
-    """Open, auto-rotate, resize and save an optimized JPEG.
-    Returns (output_path, processed_size_bytes, original_format).
-    """
     try:
         image = Image.open(input_path)
     except Exception as exc:
@@ -110,6 +127,7 @@ def optimize_image(
 
     # Apply EXIF orientation
     image = ImageOps.exif_transpose(image)
+
 
     if not orig_format:
         # Sử dụng original_key thay vì input_path vì file tạm không có đuôi mở rộng
@@ -126,6 +144,7 @@ def optimize_image(
         orig_format = ext_map.get(ext.lower(), "")
         detected_by = "extension" if orig_format else detected_by
 
+
     # (Bỏ đoạn code sử dụng imghdr cũ vì Python 3.14 không còn hỗ trợ)
 
 
@@ -133,19 +152,19 @@ def optimize_image(
         orig_format = "UNKNOWN"
 
 
-
-
     if orig_format not in SUPPORTED_FORMATS:
         raise UnsupportedFormatError(f"Unsupported image format: {orig_format} (detected_by={detected_by})")
 
 
     # Resize if needed while preserving aspect ratio
-    if image.width and image.width > max_width:
+    if resize_enabled and image.width > max_width:
         ratio = max_width / image.width
-        new_height = max(1, int(image.height * ratio))
-        image = image.resize((max_width, new_height), Image.Resampling.LANCZOS)
+        new_height = int(image.height * ratio)
 
-
+        image = image.resize(
+            (max_width, new_height),
+            Image.Resampling.LANCZOS
+        )
 
 
     # Convert paletted or alpha images to RGB for JPEG
@@ -153,18 +172,42 @@ def optimize_image(
         image = image.convert("RGB")
 
 
+    extension_map = {
+        "JPEG": ".jpg",
+        "JPG": ".jpg",
+        "PNG": ".png",
+        "WEBP": ".webp"
+    }
 
+    suffix = extension_map.get(
+        output_format,
+        ".jpg"
+    )
 
+    # out_tmp = tempfile.NamedTemporaryFile(
+    #     prefix="img_out_",
+    #     suffix=suffix,
+    #     delete=False
+    # )
     # Save optimized JPEG to a temporary file
-    out_tmp = tempfile.NamedTemporaryFile(prefix="img_out_", suffix=".jpg", delete=False)
+    out_tmp = tempfile.NamedTemporaryFile(prefix="img_out_", suffix=suffix, delete=False)
     out_path = out_tmp.name
     out_tmp.close()
 
 
-
-
     try:
-        image.save(out_path, format="JPEG", quality=quality, optimize=True)
+        save_kwargs = {
+            "format": output_format,
+            "optimize": True
+        }
+
+        if output_format in ("JPEG", "WEBP"):
+            save_kwargs["quality"] = quality
+
+        image.save(
+            out_path,
+            **save_kwargs
+        )
     except Exception as exc:
         try:
             os.remove(out_path)
@@ -173,26 +216,20 @@ def optimize_image(
         raise ImageProcessingError(f"Failed to save optimized image: {exc}")
 
 
-
-
     processed_size = os.path.getsize(out_path)
     return out_path, processed_size, orig_format
 
 
 
 
-
-
-
-
-def generate_thumbnail(input_path: str, size: Tuple[int, int] = THUMB_SIZE) -> str:
+def generate_thumbnail(input_path: str, output_format: str, size: tuple[int, int] = THUMB_SIZE) -> str:
     """Generate a thumbnail JPEG and return its local path."""
+    if output_format.upper() == "JPG":
+        output_format = "JPEG"
     try:
         image = Image.open(input_path)
     except Exception as exc:
         raise ImageProcessingError(f"Unable to open image for thumbnail: {exc}")
-
-
 
 
     image = ImageOps.exif_transpose(image)
@@ -200,18 +237,33 @@ def generate_thumbnail(input_path: str, size: Tuple[int, int] = THUMB_SIZE) -> s
         image = image.convert("RGB")
 
 
-
-
     thumb = image.copy()
     thumb.thumbnail(size, Image.Resampling.LANCZOS)
 
+    
+    suffix = {
+        "JPEG": ".jpg",
+        "PNG": ".png",
+        "WEBP": ".webp"
+    }.get(output_format, ".jpg")
 
+    tmp = tempfile.NamedTemporaryFile(
+        prefix="img_thumb_",
+        suffix=suffix,
+        delete=False
+    )
 
+    save_kwargs = {
+        "format": output_format,
+        "optimize": True
+    }
 
-    tmp = tempfile.NamedTemporaryFile(prefix="img_thumb_", suffix=".jpg", delete=False)
+    if output_format in ("JPEG", "WEBP"):
+        save_kwargs["quality"] = 85
+    
     tmp.close()
     try:
-        thumb.save(tmp.name, format="JPEG", quality=85, optimize=True)
+        thumb.save(tmp.name, **save_kwargs)
     except Exception as exc:
         try:
             os.remove(tmp.name)
@@ -220,20 +272,13 @@ def generate_thumbnail(input_path: str, size: Tuple[int, int] = THUMB_SIZE) -> s
         raise ImageProcessingError(f"Failed to save thumbnail: {exc}")
 
 
-
-
     return tmp.name
-
-
-
-
 
 
 
 
 def persist_metadata(metadata: Dict[str, Any]) -> None:
     table = dynamodb.Table(METADATA_TABLE)
-
 
 # Chuyển float -> Decimal
     item = json.loads(
@@ -257,7 +302,6 @@ def persist_metadata(metadata: Dict[str, Any]) -> None:
         httpStatus=response["ResponseMetadata"]["HTTPStatusCode"]
     )
 
-
     log_json(
         "INFO",
         "Metadata saved to DynamoDB",
@@ -265,13 +309,136 @@ def persist_metadata(metadata: Dict[str, Any]) -> None:
         processingId=metadata["processingId"]
     )
 
+def get_metadata(batch_id: str, processing_id: str) -> Dict[str, Any]:
 
+    table = dynamodb.Table(METADATA_TABLE)
 
+    response = table.get_item(
+        Key={
+            "batchId": batch_id,
+            "processingId": processing_id
+        }
+    )
 
+    item = response.get("Item")
+
+    if not item:
+        raise ImageProcessingError(
+            f"ImageMetadata not found: {batch_id}/{processing_id}"
+        )
+
+    return item
+
+def update_success_metadata(metadata: Dict[str, Any]) -> None:
+
+    table = dynamodb.Table(METADATA_TABLE)
+
+    table.update_item(
+        Key={
+            "batchId": metadata["batchId"],
+            "processingId": metadata["processingId"]
+        },
+
+        UpdateExpression="""
+            SET
+            #status = :status,
+            outputKey = :outputKey,
+            thumbnailKey = :thumbnailKey,
+            processedAt = :processedAt,
+            processedSize = :processedSize,
+            compressionRatio = :compressionRatio,
+            processingTimeMs = :processingTimeMs,
+            lambdaRequestId = :lambdaRequestId
+        """,
+
+        ExpressionAttributeNames={
+            "#status": "status"
+        },
+
+        ExpressionAttributeValues={
+
+            ":status": metadata["status"],
+
+            ":outputKey": metadata["outputKey"],
+
+            ":thumbnailKey": metadata["thumbnailKey"],
+
+            ":processedAt": metadata["processedAt"],
+
+            ":processedSize": Decimal(
+                str(metadata["processedSize"])
+            ),
+
+            ":compressionRatio": Decimal(
+                str(metadata["compressionRatio"])
+            ),
+
+            ":processingTimeMs": Decimal(
+                str(metadata["processingTimeMs"])
+            ),
+
+            ":lambdaRequestId": metadata["lambdaRequestId"]
+
+        }
+    )
+    
+def update_failed_metadata(
+
+    batch_id: str,
+    processing_id: str,
+    error_message: str,
+    processing_time: float,
+    request_id: str
+
+) -> None:
+
+    table = dynamodb.Table(METADATA_TABLE)
+
+    table.update_item(
+
+        Key={
+
+            "batchId": batch_id,
+            "processingId": processing_id
+
+        },
+
+        UpdateExpression="""
+            SET
+            #status = :status,
+            errorMessage = :errorMessage,
+            processedAt = :processedAt,
+            processingTimeMs = :processingTimeMs,
+            lambdaRequestId = :lambdaRequestId
+        """,
+
+        ExpressionAttributeNames={
+
+            "#status": "status"
+
+        },
+
+        ExpressionAttributeValues={
+
+            ":status": "FAILED",
+
+            ":errorMessage": error_message,
+
+            ":processedAt": datetime.now(
+                timezone.utc
+            ).isoformat(),
+
+            ":processingTimeMs": Decimal(
+                str(processing_time)
+            ),
+
+            ":lambdaRequestId": request_id
+
+        }
+
+    )    
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """AWS Lambda entrypoint for S3-triggered image processing.
-
-
 
 
     Expects the S3 event format and returns a small JSON response with
@@ -279,21 +446,75 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     in Lambda logs; we also emit structured JSON logs for observability.
     """
     start = time.time()
-    processing_id = str(uuid.uuid4())
-    batch_id = processing_id
-
-
+    processing_id = None
+    
+    batch_id = None
+    user_id = None
 
 
     try:
-        record = event["Records"][0]
+        record = event["Records"][0] #280
         bucket = record["s3"]["bucket"]["name"]
         key = record["s3"]["object"]["key"]
         uploaded_at = record.get("eventTime")
+        
+        object_metadata = s3.head_object(
+            Bucket=bucket,
+            Key=key
+        )
+
+        s3_metadata = object_metadata.get("Metadata", {})
+
+        batch_id = s3_metadata.get("batchid")
+        processing_id = s3_metadata.get("processingid")
+        user_id = s3_metadata.get("userid")
+        
+        if not batch_id or not processing_id:
+            raise ImageProcessingError(
+                "Missing batchId or processingId in S3 metadata"
+            )   
+            
+        image_metadata = get_metadata(
+            batch_id,
+            processing_id
+        )
+
+        config = image_metadata.get(
+            "optimizationConfig",
+            {}
+        )
+
+        quality = int(
+            config.get(
+                "quality",
+                JPEG_QUALITY
+            )
+        )
+
+        resize_enabled = config.get(
+            "resizeEnabled",
+            True
+        )
+
+        max_width = int(
+            config.get(
+                "maxWidth",
+                MAX_WIDTH
+            )
+        )
+
+        output_format = image_metadata.get(
+            "format",
+            "JPEG"
+        ).upper()
+
+        # Normalize image format name
+        if output_format == "JPG":
+            output_format = "JPEG"
+        
     except Exception as exc:
         log_json("ERROR", "Invalid event payload", error=str(exc))
         raise
-
 
     log_json(
         "INFO",
@@ -310,14 +531,10 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     thumb_path = ""
 
 
-
-
     try:
-
 
         input_path = download_s3_file(bucket, key)
         original_size = os.path.getsize(input_path)
-
 
         log_json(
             "INFO",
@@ -326,9 +543,25 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             key=key,
             originalSize=original_size
         )
+        
 
+        optimized_path, processed_size, orig_format = optimize_image(
+            input_path=input_path,
+            max_width=max_width,
+            quality=quality,
+            resize_enabled=resize_enabled,
+            output_format=output_format,
+            original_key=key
+        )  
+        # Nếu ảnh sau tối ưu lớn hơn hoặc bằng ảnh gốc thì dùng ảnh gốc
+        if processed_size >= original_size:
+            try:
+                os.remove(optimized_path)  # xóa file optimize vừa tạo
+            except Exception:
+                pass
 
-        optimized_path, processed_size, orig_format = optimize_image(input_path, original_key=key)
+            optimized_path = input_path
+            processed_size = original_size      
         log_json(
             "INFO",
             "image_optimized",
@@ -337,10 +570,39 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             format=orig_format
         )
 
+        # optimized_name = f"{processing_id}_{os.path.splitext(os.path.basename(key))[0]}.jpg"
+        # output_key = f"optimized/{optimized_name}"
+        filename = os.path.splitext(
+            os.path.basename(key)
+        )[0]
 
-        optimized_name = f"{os.path.splitext(os.path.basename(key))[0]}.jpg"
-        output_key = f"optimized/{optimized_name}"
-       
+        extension = {
+            "JPEG": ".jpg",
+            "JPG": ".jpg",
+            "PNG": ".png",
+            "WEBP": ".webp"
+        }.get(
+            output_format,
+            ".jpg"
+        )
+
+        output_key = (
+            f"optimized/{user_id}/{batch_id}/{filename}{extension}"
+        )
+
+        thumbnail_extension = {
+            "JPEG": ".jpg",
+            "JPG": ".jpg",
+            "PNG": ".png",
+            "WEBP": ".webp"
+        }.get(
+            output_format,
+            ".jpg"
+        )
+
+        thumbnail_key = (
+            f"thumbnails/{user_id}/{batch_id}/{filename}_thumb{thumbnail_extension}"
+        )
         upload_s3_file(optimized_path, OUTPUT_BUCKET, output_key)
         log_json(
             "INFO",
@@ -349,13 +611,13 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             key=output_key
         )
 
-
         # Thumbnail generation and upload
 
-
-        thumb_path = generate_thumbnail(input_path)
-        thumbnail_key = f"thumbnails/thumb_{optimized_name}"
-
+        thumb_path = generate_thumbnail(
+            input_path,
+            output_format
+        )
+        # thumbnail_key = f"thumbnails/thumb_{optimized_name}"
 
         upload_s3_file(thumb_path, OUTPUT_BUCKET, thumbnail_key)
         log_json(
@@ -365,39 +627,32 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             key=thumbnail_key
         )
 
-
         compression_ratio = round((1 - processed_size / original_size) * 100, 2) if original_size else 0.0
         processing_time = round((time.time() - start) * 1000, 2)
 
-
-        metadata = build_metadata(
-            imageId=key, 
-            batchId=batch_id,
-            processingId=processing_id,
-            originalName=os.path.basename(key),
-            inputBucket=bucket,
-            outputBucket=OUTPUT_BUCKET,
-            inputKey=key,
-            outputKey=output_key,
-            uploadedAt=uploaded_at,
-            processedAt=datetime.now(timezone.utc).isoformat(),
-            status="SUCCESS",
-            errorMessage="",
-            lambdaRequestId=getattr(context, "aws_request_id", ""),
-            originalSize=original_size,
-            processedSize=processed_size,
-            compressionRatio=compression_ratio,
-            format=orig_format,
-            processingTimeMs=processing_time,
-            thumbnailKey=thumbnail_key,
-        )
-
-
+        metadata = {
+            "batchId": batch_id,
+            "processingId": processing_id,
+            "status": "SUCCESS",
+            "outputKey": output_key,
+            "thumbnailKey": thumbnail_key,
+            "processedAt": datetime.now(timezone.utc).isoformat(),
+            "processedSize": processed_size,
+            "compressionRatio": compression_ratio,
+            "processingTimeMs": processing_time,
+            "lambdaRequestId": getattr(
+                context,
+                "aws_request_id",
+                ""
+            )
+        }
 
 
         # Emit structured log and persist metadata separately
         log_json("INFO", "image_processed", metadata=metadata)
-        persist_metadata(metadata)
+        update_success_metadata(
+            metadata
+        )        
         log_json(
             "INFO",
             "processing_completed",
@@ -407,23 +662,21 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             status="SUCCESS"
         )
 
-
         return {"statusCode": 200, "message": "Image processed successfully", "metadata": metadata}
-
-
 
 
     except UnsupportedFormatError as exc:
         processing_time = round((time.time() - start) * 1000, 2)
-        metadata = build_metadata(
-            imageId=key, 
-            batchId=batch_id,
-            processingId=processing_id,
-            status="FAILED",
-            errorMessage=str(exc),
-            processedAt=datetime.now(timezone.utc).isoformat(),
-            lambdaRequestId=getattr(context, "aws_request_id", ""),
-            processingTimeMs=processing_time,
+        update_failed_metadata(
+            batch_id=batch_id,
+            processing_id=processing_id,
+            error_message=str(exc),
+            processing_time=processing_time,
+            request_id=getattr(
+                context,
+                "aws_request_id",
+                ""
+            )
         )
         log_json(
             "ERROR",
@@ -432,59 +685,52 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             key=key,
             metadata=metadata
         )
-        persist_metadata(metadata)      
         raise
-
-
-
 
     except ImageProcessingError as exc:
         processing_time = round((time.time() - start) * 1000, 2)
-        metadata = build_metadata(
-            imageId=key, 
-            batchId=batch_id,
-            processingId=processing_id,
-            status="FAILED",
-            errorMessage=str(exc),
-            processedAt=datetime.now(timezone.utc).isoformat(),
-            lambdaRequestId=getattr(context, "aws_request_id", ""),
-            processingTimeMs=processing_time,
+        update_failed_metadata(
+            batch_id=batch_id,
+            processing_id=processing_id,
+            error_message=str(exc),
+            processing_time=processing_time,
+            request_id=getattr(
+                context,
+                "aws_request_id",
+                ""
+            )
         )
         log_json(
             "ERROR",
             "processing_error",
             bucket=bucket,
             key=key,
-            metadata=metadata
-        )   
+            error=str(exc)
+        )       
         raise
-
-
 
 
     except Exception as exc:  # pragma: no cover - unexpected
         processing_time = round((time.time() - start) * 1000, 2)
-        metadata = build_metadata(
-            imageId=key, 
-            batchId=batch_id,
-            processingId=processing_id,
-            status="FAILED",
-            errorMessage=str(exc),
-            processedAt=datetime.now(timezone.utc).isoformat(),
-            lambdaRequestId=getattr(context, "aws_request_id", ""),
-            processingTimeMs=processing_time,
+        update_failed_metadata(
+            batch_id=batch_id,
+            processing_id=processing_id,
+            error_message=str(exc),
+            processing_time=processing_time,
+            request_id=getattr(
+                context,
+                "aws_request_id",
+                ""
+            )
         )
         log_json(
             "ERROR",
             "unexpected_error",
             bucket=bucket,
             key=key,
-            metadata=metadata
+            error=str(exc)
         )
-        persist_metadata(metadata)
         raise
-
-
 
 
     finally:
@@ -495,4 +741,3 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     os.remove(path)
             except Exception:
                 pass
-

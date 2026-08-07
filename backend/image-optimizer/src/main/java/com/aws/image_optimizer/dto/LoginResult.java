@@ -8,6 +8,7 @@ import lombok.Data;
 public class LoginResult {
 
     private String userId;
+    private String token;
     private String email;
 
     private String name;
