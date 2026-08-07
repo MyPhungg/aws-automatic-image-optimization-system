@@ -22,53 +22,85 @@ function UploadDropzone({
     // Chuyển File -> ImageItem
     //------------------------------------------------------
 
-    const createImageItems = (files: FileList): Imageitem[] => {
+    const getImageMetadata = async (file: File) => {
+        const buffer = await file.arrayBuffer();
+        const digest = await crypto.subtle.digest("SHA-256", buffer);
+        const hash = Array.from(new Uint8Array(digest))
+            .map((value) => value.toString(16).padStart(2, "0"))
+            .join("");
 
-        const imageItems: Imageitem[] = [];
+        let width = 0;
+        let height = 0;
 
-        Array.from(files).forEach((file) => {
-
-            if (!file.type.startsWith("image/")) {
-
-                return;
-
-            }
-
-            imageItems.push({
-
-                id: crypto.randomUUID(),
-
-                file,
-
-                previewUrl: URL.createObjectURL(file),
-
-                name: file.name,
-
-                size: file.size,
-
-                type: file.type,
-
-                preset: "BALANCED",
-
-                status: "PENDING",
-
-                progress: 0,
-
-                createdAt: new Date()
-
+        try {
+            const bitmap = await createImageBitmap(file);
+            width = bitmap.width;
+            height = bitmap.height;
+            bitmap.close();
+        } catch {
+            const metadataImage = await new Promise<HTMLImageElement>((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error("Unable to read image metadata."));
+                image.src = URL.createObjectURL(file);
             });
 
+            width = metadataImage.width;
+            height = metadataImage.height;
+            URL.revokeObjectURL(metadataImage.src);
+        }
+
+        return {
+            width,
+            height,
+            hash,
+            totalPixels: width * height,
+        };
+    };
+
+    const createImageItems = async (files: FileList): Promise<Imageitem[]> => {
+        const imageItems: Imageitem[] = [];
+
+        const promises = Array.from(files).map(async (file) => {
+            if (!file.type.startsWith("image/")) {
+                return null;
+            }
+
+            const metadata = await getImageMetadata(file);
+
+            return {
+                id: crypto.randomUUID(),
+                file,
+                previewUrl: URL.createObjectURL(file),
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                preset: "BALANCED" as const,
+                status: "PENDING" as const,
+                progress: 0,
+                createdAt: new Date(),
+                width: metadata.width,
+                height: metadata.height,
+                totalPixels: metadata.totalPixels,
+                hash: metadata.hash,
+            };
+        });
+
+        const createdItems = await Promise.all(promises);
+        createdItems.forEach((item) => {
+            if (item) {
+                imageItems.push(item);
+            }
         });
 
         return imageItems;
-
     };
 
     //------------------------------------------------------
     // Chọn file
     //------------------------------------------------------
 
-    const handleFileChange = (
+    const handleFileChange = async (
 
         event: ChangeEvent<HTMLInputElement>
 
@@ -76,7 +108,7 @@ function UploadDropzone({
 
         if (!event.target.files) return;
 
-        const images = createImageItems(event.target.files);
+        const images = await createImageItems(event.target.files);
 
         onImagesAdded(images);
 
@@ -102,7 +134,7 @@ function UploadDropzone({
     // Drop
     //------------------------------------------------------
 
-    const handleDrop = (
+    const handleDrop = async (
 
         event: DragEvent<HTMLDivElement>
 
@@ -112,7 +144,7 @@ function UploadDropzone({
 
         if (!event.dataTransfer.files) return;
 
-        const images = createImageItems(
+        const images = await createImageItems(
 
             event.dataTransfer.files
 

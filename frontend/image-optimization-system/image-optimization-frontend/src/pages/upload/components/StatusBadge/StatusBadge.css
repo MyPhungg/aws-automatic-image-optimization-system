@@ -1,0 +1,67 @@
+.status-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+/* Pending */
+
+.status-badge.pending{
+
+    background:#FEF3C7;
+
+    color:#92400E;
+
+}
+
+/* Uploading */
+
+.status-badge.uploading{
+
+    background:#DBEAFE;
+
+    color:#1E40AF;
+
+}
+
+/* Processing */
+
+.status-badge.processing{
+
+    background:#FDE68A;
+
+    color:#B45309;
+
+}
+
+/* Success */
+
+.status-badge.success{
+
+    background:#DCFCE7;
+
+    color:#166534;
+
+}
+
+/* Failed */
+
+.status-badge.failed{
+
+    background:#FEE2E2;
+
+    color:#B91C1C;
+
+}

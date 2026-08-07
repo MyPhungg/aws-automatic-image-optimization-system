@@ -17,11 +17,11 @@ dynamodb = boto3.resource("dynamodb")
 
 
 # Configuration (can be overridden with environment variables)
-OUTPUT_BUCKET: str = os.getenv("OUTPUT_BUCKET", "auto-images-output-bucket") #đây nè
+OUTPUT_BUCKET: str = os.getenv("OUTPUT_BUCKET", "OptimizedImageBucket") #đây nè
 MAX_WIDTH: int = int(os.getenv("MAX_WIDTH", "1024"))
 JPEG_QUALITY: int = int(os.getenv("JPEG_QUALITY", "80"))
 THUMB_SIZE: Tuple[int, int] = (150, 150)
-SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP", "BMP", "TIFF"}
+SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP", "BMP", "TIFF","MPO"}
 METADATA_TABLE = os.getenv("METADATA_TABLE", "ImageMetadata")
 
 
@@ -453,10 +453,13 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 
     try:
-        record = event["Records"][0] #280
-        bucket = record["s3"]["bucket"]["name"]
-        key = record["s3"]["object"]["key"]
-        uploaded_at = record.get("eventTime")
+        # EventBridge "Object Created" format (không có Records[])
+        # Payload: {"source":"aws.s3","detail-type":"Object Created",
+        #           "detail":{"bucket":{"name":"..."},"object":{"key":"..."}}, "time":"..."}
+        detail = event.get("detail", {})
+        bucket = detail["bucket"]["name"]
+        key    = detail["object"]["key"]
+        uploaded_at = event.get("time")
         
         object_metadata = s3.head_object(
             Bucket=bucket,
@@ -552,8 +555,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             resize_enabled=resize_enabled,
             output_format=output_format,
             original_key=key
-        )  
-        # Nếu ảnh sau tối ưu lớn hơn hoặc bằng ảnh gốc thì dùng ảnh gốc
+        )
         if processed_size >= original_size:
             try:
                 os.remove(optimized_path)  # xóa file optimize vừa tạo
@@ -561,7 +563,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 pass
 
             optimized_path = input_path
-            processed_size = original_size      
+            processed_size = original_size
+
         log_json(
             "INFO",
             "image_optimized",

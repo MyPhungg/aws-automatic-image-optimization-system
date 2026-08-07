@@ -1,0 +1,115 @@
+.recent-item{
+
+    display:grid;
+
+    grid-template-columns:70px 2fr 1.5fr 1.2fr 1fr;
+
+    align-items:center;
+
+    padding:18px 22px;
+
+    background:#FFFFFF;
+
+    border-radius:16px;
+
+    margin-bottom:15px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.05);
+
+    transition:.2s;
+
+}
+
+.recent-item:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.recent-image img{
+
+    width:56px;
+
+    height:56px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+}
+
+.recent-info h4{
+
+    margin:0;
+
+    font-size:17px;
+
+    color:#111827;
+
+}
+
+.recent-info p{
+
+    margin-top:6px;
+
+    color:#6B7280;
+
+    font-size:14px;
+
+}
+
+.recent-preset{
+
+    font-weight:600;
+
+    color:#374151;
+
+}
+
+.recent-status{
+
+    width:110px;
+
+    text-align:center;
+
+    padding:8px;
+
+    border-radius:999px;
+
+    font-weight:600;
+
+    font-size:14px;
+
+}
+
+.recent-status.completed{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.recent-status.processing{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+}
+
+.recent-status.failed{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}
+
+.recent-time{
+
+    color:#6B7280;
+
+}

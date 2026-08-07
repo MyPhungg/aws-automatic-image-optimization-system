@@ -31,7 +31,8 @@ public class GoogleTokenVerifierService {
         if (idToken == null) {
             throw new RuntimeException("Invalid Google ID Token");
         }
-
+        System.out.println("Client ID = " + googleProperties.getClientId());
+System.out.println("Token = " + idTokenString);
         return idToken.getPayload();
     }
 }

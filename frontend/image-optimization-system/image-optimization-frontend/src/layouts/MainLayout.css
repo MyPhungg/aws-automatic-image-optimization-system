@@ -11,9 +11,218 @@
     background-color: #f8fafc;
 }
 .layout-content {
+     flex:1;
+
+    width:100%;
+
+    padding:30px;
+
+    overflow:auto;
+}
+.layout-body{
+
+    display:flex;
+
+    flex:1;
+
+    min-height:0;
+
+}
+.sidebar {
+
+    width:260px;
+
+    flex-shrink:0;
+
+    background:#fff;
+
+    border-right:1px solid #E5E7EB;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ==========================
+   Logo
+========================== */
+
+.sidebar-header {
+
+    padding: 28px 24px;
+
+    border-bottom: 1px solid #F1F5F9;
+
+}
+
+.sidebar-logo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+.sidebar-logo h2 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    color: #2563EB;
+
+}
+
+.sidebar-logo span {
+
+    color: #6B7280;
+
+    font-size: 14px;
+
+}
+
+/* ==========================
+   Menu
+========================== */
+
+.sidebar-menu {
+
+    padding: 24px 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
     flex: 1;
-    witdth: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
+
+}
+
+.sidebar-menu a {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    text-decoration: none;
+
+    color: #374151;
+
+    padding: 14px 18px;
+
+    border-radius: 12px;
+
+    transition: .2s;
+
+    font-weight: 500;
+
+}
+
+.sidebar-menu a:hover {
+
+    background: #EFF6FF;
+
+    color: #2563EB;
+
+}
+
+.sidebar-menu .active {
+
+    background: #2563EB;
+
+    color: white;
+
+}
+
+/* ==========================
+   User
+========================== */
+
+.sidebar-user {
+
+    padding: 20px;
+
+    border-top: 1px solid #E5E7EB;
+
+}
+
+.user-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+.avatar{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:50%;
+
+    background:#2563EB;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+}
+
+.user-info h4 {
+
+    margin: 0;
+
+}
+
+.user-info p {
+
+    margin-top: 4px;
+
+    color: #6B7280;
+
+    font-size: 14px;
+
+}
+
+.logout-btn {
+
+    width: 100%;
+
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #EF4444;
+
+    color: white;
+
+    cursor: pointer;
+
+}
+
+.logout-btn:hover {
+
+    background: #DC2626;
+
 }

@@ -69,8 +69,9 @@ public class AuthController {
 
 
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); // localhost
+        cookie.setSecure(true); // Must be true for cross-origin over HTTPS
         cookie.setPath("/");
+        cookie.setAttribute("SameSite", "None"); // Required for cross-domain cookie with GitHub Pages
         cookie.setMaxAge(
                 24 * 60 * 60
         );
@@ -101,8 +102,9 @@ public class AuthController {
                 );
 
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); // localhost
+        cookie.setSecure(true);
         cookie.setPath("/");
+        cookie.setAttribute("SameSite", "None");
         cookie.setMaxAge(0);
 
 

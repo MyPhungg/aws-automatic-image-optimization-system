@@ -1,4 +1,4 @@
-import type { AdminUser, AdminImage, DashboardStats } from "../types/Admin";
+import type { AdminUser, AdminImage, DashboardStats } from "../../types/Admin";
 
 // ─── Mock data – thay bằng API thực khi backend sẵn sàng ────────────────────
 
